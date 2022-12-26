@@ -1,12 +1,17 @@
 ---
 http:
   services:
-    sc-apiserver:
+    svc-apiserver:
       loadBalancer:
         servers:
         - url: "${API_SERVER_URL}"
 
-    sc-webserver:
+    svc-webserver:
       loadBalancer:
         servers:
         - url: "${WEB_SERVER_URL}"
+
+    svc-appserver:
+      loadBalancer:
+        servers:
+        - url: "${APP_SERVER_URL}"

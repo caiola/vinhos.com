@@ -13,18 +13,50 @@ http:
         # certResolver: letsencrypt
         certresolver: le
 
-    rtdomainapiserver:
+    rtdomainapiserverdev:
       entryPoints:
       - websecure
       middlewares:
       - security
       - compression
-      service: sc-apiserver
-      rule: Host (`${DOMAIN_VHOST_TEST}`)
+      service: svc-apiserver
+      rule: Host (`${DOMAIN_VHOST_API_DEV}`)
       tls:
         # certResolver: letsencrypt
         certresolver: le
         domains:
-          - main: "${DOMAIN_VHOST_TEST}"
+          - main: "${DOMAIN_VHOST_API_DEV}"
             sans:
-              - "${DOMAIN_VHOST_TEST}"
+              - "${DOMAIN_VHOST_API_DEV}"
+
+    rtdomainwebserverdev:
+      entryPoints:
+      - websecure
+      middlewares:
+      - security
+      - compression
+      service: svc-webserver
+      rule: Host (`${DOMAIN_VHOST_WWW_DEV}`)
+      tls:
+        # certResolver: letsencrypt
+        certresolver: le
+        domains:
+          - main: "${DOMAIN_VHOST_WWW_DEV}"
+            sans:
+              - "${DOMAIN_VHOST_WWW_DEV}"
+
+    rtdomainappserverdev:
+      entryPoints:
+      - websecure
+      middlewares:
+      - security
+      - compression
+      service: svc-appserver
+      rule: Host (`${DOMAIN_VHOST_APP_DEV}`)
+      tls:
+        # certResolver: letsencrypt
+        certresolver: le
+        domains:
+          - main: "${DOMAIN_VHOST_APP_DEV}"
+            sans:
+              - "${DOMAIN_VHOST_APP_DEV}"
