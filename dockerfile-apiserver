@@ -1,0 +1,37 @@
+# FROM python:3.7.16-slim
+FROM python:3.8
+
+# Make a working directory in the image and set it as working dir.
+RUN mkdir /app
+WORKDIR /app
+
+# Run a series of Linux commands to ensure that
+# 1. Everything is up-to-date and
+# 2. Install GDAL
+# RUN apt-get -y update && apt-get -y upgrade && apt-get -y install libgdal-dev
+
+# make sure that pip & setuptools are installed and to date
+RUN pip install --upgrade pip setuptools wheel
+
+# ERROR "you need a C compiler to build uWSGI"
+RUN apt-get -y install gcc
+# RUN apt install uwsgi-plugin-python3
+
+# Get the following libraries. We caan install them "globally" on the image as it will contain only our project
+# RUN apt-get -y install build-essential python-cffi libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
+
+# FROM apiserver_build
+
+EXPOSE 3000
+
+# We are using /mnt
+
+COPY requirements.txt .
+COPY requirements-dev.txt .
+RUN pip install -r requirements-dev.txt
+COPY . .
+
+# uwsgi --ini myconf.ini --http :9090 --log-to /tmp/uwsgi.log
+# CMD [ "uwsgi", "--ini", "app.ini", "--http", ":5000", "--logto", "uwsgi.log" ]
+
+CMD [ "uwsgi", "--ini", "app.ini" ]

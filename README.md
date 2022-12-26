@@ -165,3 +165,12 @@ You can easily do that with the swagger package included in the starter kit.
 Simply add a docstring to the resources of your API like in the `user` example.
 The API description will be available [here](http://127.0.0.1:3000/application/spec).
 The Swagger UI will be available [here](http://127.0.0.1:3000/apidocs/).
+
+## Running locally on Windows
+
+```
+pip install virtualenv
+virtualenv env
+env\Scripts\activate.bat
+pip install -r requirements-dev.txt --upgrade --no-warn-script-location
+```

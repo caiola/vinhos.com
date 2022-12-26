@@ -1,18 +1,35 @@
 version: "2"
 
 services:
-  server:
+  apiserver:
+    hostname: apiserver
     env_file:
       - .env
-    image: python:3.7.16-slim
-    working_dir: /mnt
+    # image: python:3.7.16-slim
+    build:
+      context: .
+      dockerfile: dockerfile-apiserver
+    # working_dir: /mnt
+    working_dir: /app
     volumes:
-      - .:/mnt
+      # - .:/mnt
+      - .:/app
 #    depends_on:
 #      - db
     ports:
       - 3000:3000
-    command: python src/server.py
+    # command: python src/server.py
+
+  nginx:
+    hostname: nginx
+    # image: webapp-nginx
+    build:
+      context: .
+      dockerfile: dockerfile-nginx
+    ports:
+      - 8080:80
+    depends_on:
+      - apiserver
 
   dbdata:
     image: busybox
@@ -27,9 +44,9 @@ services:
   testserver:
     env_file: .env
     image: python:3.7.16-slim
-    working_dir: /mnt
+    working_dir: /app
     volumes:
-      - .:/mnt
+      - .:/app
     depends_on:
       - testdb
     ports:
