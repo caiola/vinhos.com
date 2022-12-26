@@ -1,5 +1,5 @@
-# FROM python:3.7.16-slim
-FROM python:3.8
+ARG PYTHON_VERSION
+FROM python:${PYTHON_VERSION}
 
 # Make a working directory in the image and set it as working dir.
 RUN mkdir /app

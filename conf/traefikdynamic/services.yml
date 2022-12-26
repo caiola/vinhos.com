@@ -1,0 +1,12 @@
+---
+http:
+  services:
+    sc-apiserver:
+      loadBalancer:
+        servers:
+        - url: "${API_SERVER_URL}"
+
+    sc-webserver:
+      loadBalancer:
+        servers:
+        - url: "${WEB_SERVER_URL}"

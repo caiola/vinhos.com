@@ -1,35 +1,71 @@
-version: "2"
+# running docker-compose has requirements => make server.network
+# docker network create netpublic
+# docker-compose build --no-cache --pull && docker-compose up --force-recreate
 
+version: "3.4"
 services:
+  traefik:
+    image: traefik:${TRAEFIK_VERSION}
+    env_file: .env
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./conf/acme.json:/etc/traefik/acme/acme.json
+      - ./conf/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./conf/traefikdynamic:/etc/traefik/dynamic:ro
+      - ./logs/traefik.log:/etc/traefik/applog.log
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      TZ: ${TIMEZONE}
+    restart: unless-stopped
+    networks:
+      - netpublic
+
   apiserver:
     hostname: apiserver
-    env_file:
-      - .env
-    # image: python:3.7.16-slim
+    #environment:
+    #  - env_var_name=${VARIABLE_NAME}
+    env_file: .env
     build:
       context: .
+      args:
+        - PYTHON_VERSION=${PYTHON_VERSION}
       dockerfile: dockerfile-apiserver
     # working_dir: /mnt
     working_dir: /app
     volumes:
-      # - .:/mnt
       - .:/app
-#    depends_on:
-#      - db
     ports:
-      - 3000:3000
+      - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
     # command: python src/server.py
 
-  nginx:
-    hostname: nginx
-    # image: webapp-nginx
+  webserver:
+    hostname: webserver
+    env_file: .env
     build:
       context: .
+      args:
+        - NGINX_VERSION=${NGINX_VERSION}
       dockerfile: dockerfile-nginx
     ports:
-      - 8080:80
+      - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
     depends_on:
       - apiserver
+
+  app1:
+    image: containous/whoami
+    hostname: app1
+    container_name: app1
+    networks:
+      - netpublic
 
   dbdata:
     image: busybox
@@ -43,7 +79,7 @@ services:
 
   testserver:
     env_file: .env
-    image: python:3.7.16-slim
+    image: python:${PYTHON_VERSION}
     working_dir: /app
     volumes:
       - .:/app
@@ -59,3 +95,11 @@ services:
   testdb:
 #   image: postgres:9.4
     image: oraclelinux:8-slim
+
+networks:
+  netpublic:
+    external: true
+
+#volumes:
+#  datanginxlogs1:
+#  datawebserver1:

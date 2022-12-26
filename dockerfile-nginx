@@ -1,4 +1,5 @@
-FROM nginx:latest
+ARG NGINX_VERSION
+FROM nginx:${NGINX_VERSION}
 
 EXPOSE 80
 

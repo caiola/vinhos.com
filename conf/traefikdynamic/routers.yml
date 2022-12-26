@@ -1,0 +1,30 @@
+---
+http:
+  routers:
+    traefik:
+      entryPoints:
+      - websecure
+      middlewares:
+      - authentification
+
+      service: api@internal
+      rule: "Host(`${DOMAIN_VHOST_BOARD}`)"
+      tls:
+        # certResolver: letsencrypt
+        certresolver: le
+
+    rtdomainapiserver:
+      entryPoints:
+      - websecure
+      middlewares:
+      - security
+      - compression
+      service: sc-apiserver
+      rule: Host (`${DOMAIN_VHOST_TEST}`)
+      tls:
+        # certResolver: letsencrypt
+        certresolver: le
+        domains:
+          - main: "${DOMAIN_VHOST_TEST}"
+            sans:
+              - "${DOMAIN_VHOST_TEST}"
