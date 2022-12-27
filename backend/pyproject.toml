@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "vinhos.com"
+version = "0.1.0"
+description = "Wine add website"
+authors = ["Roberto Caiola <robccsilva@gmail.com>, Sérgio den Boer <den.boer.sergio@gmail.com>"]
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask-restful = "^0.3.9"
+flask-sqlalchemy = "^3.0.2"
+flask-script = "^2.0.6"
+flasgger = "^0.9.5"
+uwsgi = "^2.0.21"
+pymysql = "^1.0.2"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+isort = "^5.11.4"
+flake8 = "^6.0.0"
+pytest = "^7.2.0"
+safety = "^2.3.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
