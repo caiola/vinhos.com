@@ -20,9 +20,9 @@ services:
       - ./data/letsencrypt/acme.json:/etc/traefik/acme/acme.json
       - ./conf/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./conf/traefik/traefikdynamic:/etc/traefik/dynamic:ro
-      - ./data/logs/traefik/:/etc/traefik/
-      - ./data/localtime:/etc/localtime:ro
-      - ./data/run/:/var/run/
+      #- ./data/logs/traefik/:/etc/traefik/
+      #- ./data/localtime:/etc/localtime:ro
+      #- ./data/run/:/var/run/
     environment:
       TZ: ${TIMEZONE}
     restart: unless-stopped
