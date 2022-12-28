@@ -42,7 +42,7 @@ services:
     # working_dir: /mnt
     working_dir: /app
     volumes:
-      - .:/app
+      - ./backend:/app
     ports:
       - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
     # command: python src/server.py
@@ -79,10 +79,10 @@ services:
 
   testserver:
     env_file: .env
-    image: python:${PYTHON_VERSION}
+    image: python:3.10
     working_dir: /app
     volumes:
-      - .:/app
+      - ./backend:/app
     depends_on:
       - testdb
     ports:
