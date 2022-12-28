@@ -169,8 +169,6 @@ The Swagger UI will be available [here](http://127.0.0.1:3000/apidocs/).
 ## Running locally on Windows
 
 ```
-pip install virtualenv
-virtualenv env
-env\Scripts\activate.bat
-pip install -r requirements-dev.txt --upgrade --no-warn-script-location
+pip install poetry
+poetry install
 ```

@@ -79,7 +79,7 @@ services:
 
   testserver:
     env_file: .env
-    image: python:${PYTHON_VERSION}
+    image: python:3.10
     working_dir: /app
     volumes:
       - ./backend:/app
