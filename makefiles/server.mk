@@ -4,6 +4,9 @@
 dev: ## Install server with its dependencies
 	docker-compose -f docker-compose.yml up --build traefik apiserver webserver appserver
 
+gotraefik: ## Install server with its dependencies
+	docker-compose exec traefik bash
+
 server.install: ## Install server with its dependencies
 	docker-compose run --rm apiserver poetry install
 
