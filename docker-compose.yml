@@ -41,9 +41,11 @@ services:
     working_dir: /app
     volumes:
       - ./backend:/app
-      - type: bind
-        source: ./data/api/server.log
-        target: /app/api/server.log
+      - ./data/api/server.log:/app/api/server.log
+#      - type: volume
+#        source: apiserver_logs
+#        target: /app/api/server.log
+#        read_only: false
     ports:
       - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
     # command: python src/server.py
@@ -106,5 +108,9 @@ networks:
     external: true
 
 #volumes:
-#  datanginxlogs1:
-#  datawebserver1:
+#  apiserver_logs:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      device: /c/dev_vinhos.com/vinhos.com/data/
+#      o: bind
