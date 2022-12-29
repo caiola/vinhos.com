@@ -31,11 +31,9 @@ services:
 
   apiserver:
     hostname: apiserver
-    #environment:
-    #  - env_var_name=${VARIABLE_NAME}
     env_file: .env
     build:
-      context: ./backend.
+      context: ./backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
       dockerfile: dockerfile-apiserver
@@ -64,10 +62,12 @@ services:
     networks:
       - netpublic
 
-  app1:
+  appserver:
     image: containous/whoami
-    hostname: app1
-    container_name: app1
+    hostname: appserver
+    container_name: appserver
+    ports:
+      - ${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}
     networks:
       - netpublic
 

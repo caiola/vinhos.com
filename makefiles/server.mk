@@ -2,13 +2,13 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 dev: ## Install server with its dependencies
-	docker-compose up --build traefik apiserver webserver app1
+	docker-compose -f docker-compose.yml up --build traefik apiserver webserver appserver
 
 server.install: ## Install server with its dependencies
 	docker-compose run --rm apiserver poetry install
 
 server.start: ## Start server in its docker container
-	docker-compose up traefik apiserver webserver app1
+	docker-compose -f docker-compose.yml up --build traefik apiserver webserver appserver
 
 server.bash: ## Connect to server to lauch commands
 	docker-compose exec apiserver bash

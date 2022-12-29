@@ -109,6 +109,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.dev
+.env.qa
+.env.pre
+.env.prod
 
 # Spyder project settings
 .spyderproject

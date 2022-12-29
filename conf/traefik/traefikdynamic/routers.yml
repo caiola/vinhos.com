@@ -20,14 +20,14 @@ http:
       - security
       - compression
       service: svc-apiserver
-      rule: Host (`${DOMAIN_VHOST_API_DEV}`)
+      rule: Host (`${DOMAIN_VHOST_API}`)
       tls:
         # certResolver: letsencrypt
         certresolver: le
         domains:
-          - main: "${DOMAIN_VHOST_API_DEV}"
+          - main: "${DOMAIN_VHOST_API}"
             sans:
-              - "${DOMAIN_VHOST_API_DEV}"
+              - "${DOMAIN_VHOST_API}"
 
     rtdomainwebserverdev:
       entryPoints:
@@ -36,14 +36,14 @@ http:
       - security
       - compression
       service: svc-webserver
-      rule: Host (`${DOMAIN_VHOST_WWW_DEV}`)
+      rule: Host (`${DOMAIN_VHOST_WEB}`)
       tls:
         # certResolver: letsencrypt
         certresolver: le
         domains:
-          - main: "${DOMAIN_VHOST_WWW_DEV}"
+          - main: "${DOMAIN_VHOST_WEB}"
             sans:
-              - "${DOMAIN_VHOST_WWW_DEV}"
+              - "${DOMAIN_VHOST_WEB}"
 
     rtdomainappserverdev:
       entryPoints:
@@ -52,11 +52,11 @@ http:
       - security
       - compression
       service: svc-appserver
-      rule: Host (`${DOMAIN_VHOST_APP_DEV}`)
+      rule: Host (`${DOMAIN_VHOST_APP}`)
       tls:
         # certResolver: letsencrypt
         certresolver: le
         domains:
-          - main: "${DOMAIN_VHOST_APP_DEV}"
+          - main: "${DOMAIN_VHOST_APP}"
             sans:
-              - "${DOMAIN_VHOST_APP_DEV}"
+              - "${DOMAIN_VHOST_APP}"
