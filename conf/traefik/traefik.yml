@@ -11,11 +11,11 @@ pilot:
   dashboard: true
 
 log:
-  filePath: "log-file.log"
   level: DEBUG
+  filePath: "/var/log/log-file.log"
 
 accessLog:
-  filePath: "log-access.log"
+  filePath: "/var/log/log-access.log"
   bufferingSize: 100
 
 providers:

@@ -2,10 +2,11 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 dev: ## Install server with its dependencies
-	docker-compose -f docker-compose.yml up --build traefik apiserver webserver appserver
+	docker-compose down && docker-compose build && docker-compose -f docker-compose.yml up
+	# docker-compose down && docker-compose build && docker-compose -f docker-compose.yml up --build traefik apiserver webserver appserver
 
 gotraefik: ## Install server with its dependencies
-	docker-compose exec traefik bash
+	docker-compose exec traefik sh
 
 server.install: ## Install server with its dependencies
 	docker-compose run --rm apiserver poetry install

@@ -2,7 +2,7 @@
 # docker network create netpublic
 # docker-compose build --no-cache --pull && docker-compose up --force-recreate
 
-version: "3.4"
+version: "3.9"
 services:
   traefik:
     image: traefik:${TRAEFIK_VERSION}
@@ -16,15 +16,30 @@ services:
         published: 443
         protocol: tcp
         mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
     volumes:
       - ./data/letsencrypt/acme.json:/etc/traefik/acme/acme.json
       - ./conf/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./conf/traefik/traefikdynamic:/etc/traefik/dynamic:ro
+      - ./logs/traefik:/var/log
+      # - ./data/traefik/run:/var/run
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- ./logs/traefik/log-access.log:/log-access.log
+      #- ./logs/traefik/log-file.log:/log-file.log
       #- ./data/logs/traefik/:/etc/traefik/
       #- ./data/localtime:/etc/localtime:ro
       #- ./data/run/:/var/run/
     environment:
-      TZ: ${TIMEZONE}
+      - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
+      - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
+      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+      - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - DOMAIN_VHOST_TEST=${DOMAIN_VHOST_TEST}
+      - TZ=${TIMEZONE}
     restart: unless-stopped
     networks:
       - netpublic
@@ -41,13 +56,14 @@ services:
     working_dir: /app
     volumes:
       - ./backend:/app
-      - ./data/api/server.log:/app/api/server.log
+      #- ./data/api/server.log:/app/api/server.log
 #      - type: volume
 #        source: apiserver_logs
 #        target: /app/api/server.log
 #        read_only: false
     ports:
-      - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
+      - 20080:80
+      # - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
     # command: python src/server.py
     networks:
       - netpublic
@@ -61,7 +77,8 @@ services:
         - NGINX_VERSION=${NGINX_VERSION}
       dockerfile: dockerfile-nginx
     ports:
-      - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
+      - 30080:80
+      # - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
     depends_on:
       - apiserver
     networks:
@@ -69,39 +86,40 @@ services:
 
   appserver:
     image: containous/whoami
-    hostname: appserver
-    container_name: appserver
+    #hostname: appserver
+    #container_name: appserver
     ports:
-      - ${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}
+      - 10080:80
+      # - ${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}
     networks:
       - netpublic
 
-  dbdata:
-    image: busybox
-    volumes:
-      - ./data/mysql/data:/var/lib/mysql/data
-
-  testserver:
-    env_file: .env
-    image: python:3.10
-    working_dir: /app
-    volumes:
-      - ./backend:/app
-    depends_on:
-      - testdb
-    ports:
-      - 5053:5053
-    environment:
-      APPLICATION_PORT: 5053
-      APPLICATION_DB_CONTAINER: testdb
-    command: python -m pytest test/
-    networks:
-      - netpublic
-
-  testdb:
-    image: oraclelinux:8-slim
-    networks:
-      - netpublic
+#  dbdata:
+#    image: busybox
+#    volumes:
+#      - ./data/mysql/data:/var/lib/mysql/data
+#
+#  testserver:
+#    env_file: .env
+#    image: python:3.10
+#    working_dir: /app
+#    volumes:
+#      - ./backend:/app
+#    depends_on:
+#      - testdb
+#    ports:
+#      - 5053:5053
+#    environment:
+#      APPLICATION_PORT: 5053
+#      APPLICATION_DB_CONTAINER: testdb
+#    command: python -m pytest test/
+#    networks:
+#      - netpublic
+#
+#  testdb:
+#    image: oraclelinux:8-slim
+#    networks:
+#      - netpublic
 
 networks:
   netpublic:
