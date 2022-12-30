@@ -12,11 +12,11 @@ pilot:
 
 log:
   level: DEBUG
-  filePath: "/var/log/log-file.log"
+  # filePath: "/var/log/log-file.log"
 
-accessLog:
-  filePath: "/var/log/log-access.log"
-  bufferingSize: 100
+# accessLog:
+#  filePath: "/var/log/log-access.log"
+#  bufferingSize: 100
 
 providers:
   docker:

@@ -8,30 +8,10 @@ services:
     image: traefik:${TRAEFIK_VERSION}
     env_file: .env
     ports:
-      - target: 80
-        published: 80
-        protocol: tcp
-        mode: host
-      - target: 443
-        published: 443
-        protocol: tcp
-        mode: host
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: host
-    volumes:
-      - ./data/letsencrypt/acme.json:/etc/traefik/acme/acme.json
-      - ./conf/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./conf/traefik/traefikdynamic:/etc/traefik/dynamic:ro
-      - ./logs/traefik:/var/log
-      # - ./data/traefik/run:/var/run
-      - /var/run/docker.sock:/var/run/docker.sock
-      #- ./logs/traefik/log-access.log:/log-access.log
-      #- ./logs/traefik/log-file.log:/log-file.log
-      #- ./data/logs/traefik/:/etc/traefik/
-      #- ./data/localtime:/etc/localtime:ro
-      #- ./data/run/:/var/run/
+      - 80:80
+      - 443:443
+    container_name: traefik
+    hostname: traefik
     environment:
       - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
       - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
@@ -39,8 +19,69 @@ services:
       - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
       - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
       - DOMAIN_VHOST_TEST=${DOMAIN_VHOST_TEST}
+      - TRAEFIK_SSLEMAIL=${TRAEFIK_SSLEMAIL}
+      - TRAEFIK_BASIC_AUTH_USER_PASSWORD=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}
       - TZ=${TIMEZONE}
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker
+      # Do not expose containers unless explicitly told so
+      - --providers.docker.exposedByDefault=false
+      - --api
+      - --certificatesresolvers.le.acme.email=${TRAEFIK_SSLEMAIL?Variable not set}
+      - --certificatesresolvers.le.acme.storage=./acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./acme.json:/acme.json"
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      - "traefik.http.routers.traefik.rule=Host(`${DOMAIN_VHOST_BOARD}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=le"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.middlewares=authtraefik"
+      - "traefik.http.middlewares.authtraefik.basicauth.users=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}"
+      # global redirect to https
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      # middleware redirect
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     restart: unless-stopped
+    networks:
+      - netpublic
+
+  appserver:
+    image: containous/whoami:v1.3.0
+    hostname: appserver
+    container_name: appserver
+    restart: unless-stopped
+    environment:
+      - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
+      - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
+      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+      - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - DOMAIN_VHOST_TEST=${DOMAIN_VHOST_TEST}
+      - TRAEFIK_BASIC_AUTH_USER_PASSWORD=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}
+      - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
+      # - "traefik.http.routers.appserver.middlewares=auth"
+      - "traefik.http.routers.appserver.entrypoints=websecure"
+      - "traefik.http.routers.appserver.tls=true"
+      - "traefik.http.routers.appserver.tls.certresolver=le"
+      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+      # - "traefik.http.routers.appserver.tls.domains[1].main=app-dev.example.com"
+      # - "traefik.http.middlewares.authtraefik.basicauth.users=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}"
     networks:
       - netpublic
 
@@ -57,14 +98,31 @@ services:
     volumes:
       - ./backend:/app
       #- ./data/api/server.log:/app/api/server.log
-#      - type: volume
-#        source: apiserver_logs
-#        target: /app/api/server.log
-#        read_only: false
+    #      - type: volume
+    #        source: apiserver_logs
+    #        target: /app/api/server.log
+    #        read_only: false
     ports:
       - 20080:80
       # - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
     # command: python src/server.py
+    environment:
+      - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
+      - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
+      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+      - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - DOMAIN_VHOST_TEST=${DOMAIN_VHOST_TEST}
+      - TRAEFIK_BASIC_AUTH_USER_PASSWORD=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}
+      - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apiserver.rule=Host(`${DOMAIN_VHOST_API}`)"
+      - "traefik.http.routers.apiserver.entrypoints=websecure"
+      - "traefik.http.routers.apiserver.tls=true"
+      - "traefik.http.routers.apiserver.tls.certresolver=le"
+      - "traefik.http.routers.apiserver.tls.domains[0].main=${DOMAIN_VHOST_API}"
+      - "traefik.http.services.apiserver.loadbalancer.server.port=20080"
     networks:
       - netpublic
 
@@ -84,51 +142,33 @@ services:
     networks:
       - netpublic
 
-  appserver:
-    image: containous/whoami
-    #hostname: appserver
-    #container_name: appserver
+  dbdata:
+    image: busybox
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql/data
+
+  testserver:
+    env_file: .env
+    image: python:3.10
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - testdb
     ports:
-      - 10080:80
-      # - ${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}
+      - 5053:5053
+    environment:
+      APPLICATION_PORT: 5053
+      APPLICATION_DB_CONTAINER: testdb
+    command: python -m pytest test/
     networks:
       - netpublic
 
-#  dbdata:
-#    image: busybox
-#    volumes:
-#      - ./data/mysql/data:/var/lib/mysql/data
-#
-#  testserver:
-#    env_file: .env
-#    image: python:3.10
-#    working_dir: /app
-#    volumes:
-#      - ./backend:/app
-#    depends_on:
-#      - testdb
-#    ports:
-#      - 5053:5053
-#    environment:
-#      APPLICATION_PORT: 5053
-#      APPLICATION_DB_CONTAINER: testdb
-#    command: python -m pytest test/
-#    networks:
-#      - netpublic
-#
-#  testdb:
-#    image: oraclelinux:8-slim
-#    networks:
-#      - netpublic
+  testdb:
+    image: oraclelinux:8-slim
+    networks:
+      - netpublic
 
 networks:
   netpublic:
     external: true
-
-#volumes:
-#  apiserver_logs:
-#    driver: local
-#    driver_opts:
-#      type: none
-#      device: /c/dev_vinhos.com/vinhos.com/data/
-#      o: bind
