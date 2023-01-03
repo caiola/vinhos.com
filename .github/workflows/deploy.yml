@@ -23,7 +23,7 @@ jobs:
       #  run: |
       #    scp -r build/* user@dev-server:/var/www/html
       #    ssh user@dev-server "systemctl reload nginx"
-        uses: appleboy/scp-action@v2
+        uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.WEB_SERVER_HOST }}
           username: ${{ secrets.WEB_SERVER_USERNAME }}
