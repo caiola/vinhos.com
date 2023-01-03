@@ -2,8 +2,10 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 dev: ## Install server with its dependencies
-	docker-compose down && docker-compose build && docker-compose -f docker-compose.yml up
-	# docker-compose down && docker-compose build && docker-compose -f docker-compose.yml up --build traefik apiserver webserver appserver
+	docker-compose -f docker-compose-dev.yml down && docker-compose -f docker-compose-dev.yml build && docker-compose -f docker-compose-dev.yml up --build traefik apiserver webserver appserver
+
+prod: ## Install server with its dependencies
+	docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml build && docker-compose -f docker-compose-prod.yml up --build traefik apiserver webserver appserver
 
 gotraefik: ## Install server with its dependencies
 	docker-compose exec traefik sh

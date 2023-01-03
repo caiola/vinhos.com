@@ -70,18 +70,14 @@ services:
       - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
       - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
       - DOMAIN_VHOST_TEST=${DOMAIN_VHOST_TEST}
-      - TRAEFIK_BASIC_AUTH_USER_PASSWORD=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}
       - TZ=${TIMEZONE}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
-      # - "traefik.http.routers.appserver.middlewares=auth"
       - "traefik.http.routers.appserver.entrypoints=websecure"
       - "traefik.http.routers.appserver.tls=true"
       - "traefik.http.routers.appserver.tls.certresolver=le"
       - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
-      # - "traefik.http.routers.appserver.tls.domains[1].main=app-dev.example.com"
-      # - "traefik.http.middlewares.authtraefik.basicauth.users=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}"
     networks:
       - netpublic
 
