@@ -33,7 +33,14 @@ $ git clone https://github.com/antkahn/flask-api-starter-kit.git <my-project-nam
 $ cd <my-project-name>
 ```
 
-Then install dependencies and check that it works
+## Local Development
+In order to run a local development environment:
+1. Copy `.env.sample` to a `.env` file and change values if needed
+2. `docker-compose up -d`
+3. `docker-compose exec app bash`
+4. To start a development server `flask run --host 0.0.0.0`
+
+## Local Deployment
 
 ```bash
 $ make server.install      # Install the pip dependencies on the docker container

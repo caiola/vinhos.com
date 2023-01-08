@@ -1,105 +1,19 @@
-# running docker-compose has requirements => make server.network
-# docker network create netpublic
-# docker-compose build --no-cache --pull && docker-compose up --force-recreate
-
 version: "3.4"
 services:
-  traefik:
-    image: traefik:${TRAEFIK_VERSION}
-    env_file: .env
-    ports:
-      - target: 80
-        published: 80
-        protocol: tcp
-        mode: host
-      - target: 443
-        published: 443
-        protocol: tcp
-        mode: host
+  db:
+    image: mariadb:10.6.11
     volumes:
-      - ./conf/acme.json:/etc/traefik/acme/acme.json
-      - ./conf/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./conf/traefikdynamic:/etc/traefik/dynamic:ro
-      - /opt/docker/logs/:/etc/traefik/applog.log:w
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      TZ: ${TIMEZONE}
-    restart: unless-stopped
-    networks:
-      - netpublic
-
-  apiserver:
-    hostname: apiserver
-    #environment:
-    #  - env_var_name=${VARIABLE_NAME}
+      - ./data/mariadb:/var/lib/mysql
     env_file: .env
+  app:
     build:
-      context: .
-      args:
-        - PYTHON_VERSION=${PYTHON_VERSION}
-      dockerfile: dockerfile-apiserver
-    # working_dir: /mnt
-    working_dir: /app
-    volumes:
-      - ./backend:/app
-    ports:
-      - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
-    # command: python src/server.py
-
-  webserver:
-    hostname: webserver
+      context: backend
+      dockerfile: Dockerfile.local
+    command: tail -f /dev/null
     env_file: .env
-    build:
-      context: .
-      args:
-        - NGINX_VERSION=${NGINX_VERSION}
-      dockerfile: dockerfile-nginx
     ports:
-      - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
-    depends_on:
-      - apiserver
-
-  app1:
-    image: containous/whoami
-    hostname: app1
-    container_name: app1
-    networks:
-      - netpublic
-
-  dbdata:
-    image: busybox
-    volumes:
-#     - /var/lib/postgresql/data
-      - /var/lib/mysql/data
-#  db:
-#    image: postgres:9.4
-#    volumes_from:
-#      - dbdata
-
-  testserver:
-    env_file: .env
-    image: python:3.10
-    working_dir: /app
+      - 5000:5000
     volumes:
       - ./backend:/app
     depends_on:
-      - testdb
-    ports:
-      - 5053:5053
-    environment:
-      APPLICATION_PORT: 5053
-      APPLICATION_DB_CONTAINER: testdb
-    command: python -m pytest test/
-
-  testdb:
-#   image: postgres:9.4
-    image: oraclelinux:8-slim
-
-networks:
-  netpublic:
-    external: true
-
-#volumes:
-#  datanginxlogs1:
-#  datawebserver1:
+      - db
