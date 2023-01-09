@@ -10,15 +10,14 @@ services:
     ports:
       - 80:80
       - 443:443
-    container_name: traefik
     hostname: traefik
+    container_name: traefik
     environment:
       - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
       - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
       - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
       - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
       - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
-      - DOMAIN_VHOST_TEST=${DOMAIN_VHOST_TEST}
       - TRAEFIK_SSLEMAIL=${TRAEFIK_SSLEMAIL}
       - TRAEFIK_BASIC_AUTH_USER_PASSWORD=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}
       - TZ=${TIMEZONE}
@@ -83,13 +82,13 @@ services:
 
   apiserver:
     hostname: apiserver
+    container_name: apiserver
     env_file: .env
     build:
       context: ./backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
-      dockerfile: dockerfile-apiserver
-    # working_dir: /mnt
+      dockerfile: backend/dockerfile-apiserver
     working_dir: /app
     volumes:
       - ./backend:/app
@@ -129,7 +128,7 @@ services:
       context: ./backend
       args:
         - NGINX_VERSION=${NGINX_VERSION}
-      dockerfile: dockerfile-nginx
+      dockerfile: backend/dockerfile-nginx
     ports:
       - 30080:80
       # - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
