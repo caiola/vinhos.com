@@ -10,8 +10,8 @@ services:
     ports:
       - 80:80
       - 443:443
-    container_name: traefik
     hostname: traefik
+    container_name: traefik
     environment:
       - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
       - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
@@ -35,6 +35,7 @@ services:
       - "--certificatesResolvers.le.acme.tlschallenge=true"
       - "--accesslog=true"
       - "--log.level=DEBUG"
+      # - "--certificatesResolvers.le.acme.storage=/acme.json"
     ports:
       - "80:80"
       - "443:443"
@@ -66,7 +67,7 @@ services:
     container_name: apiserver
     env_file: .env
     build:
-      context: backend
+      context: ./backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
       dockerfile: dockerfile-apiserver-local
@@ -75,10 +76,6 @@ services:
       - ./backend:/app
     ports:
       - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
-    #ports:
-    #  - 20080:80
-      # - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
-    # command: python src/server.py
     environment:
       - FLASK_APP=${FLASK_APP}
       - FLASK_DEBUG=${FLASK_DEBUG}
@@ -102,48 +99,27 @@ services:
       - netpublic
 
   appserver:
-    image: containous/whoami:v1.3.0
+    image: containous/whoami:v1.5.0
     hostname: appserver
     container_name: appserver
     env_file: .env
     restart: unless-stopped
-    #environment:
-    #  - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
-    #  - TZ=${TIMEZONE}
+    environment:
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - TZ=${TIMEZONE}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
-      # - "traefik.http.routers.appserver.middlewares=auth"
       - "traefik.http.routers.appserver.entrypoints=websecure"
       - "traefik.http.routers.appserver.tls=true"
       - "traefik.http.routers.appserver.tls.certresolver=le"
       - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
-      # - "traefik.http.routers.appserver.tls.domains[1].main=app-dev.example.com"
-      # - "traefik.http.middlewares.authtraefik.basicauth.users=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}"
     networks:
       - netpublic
 
-#  webserver:
-#    hostname: webserver
-#    env_file: ../.env
-#    build:
-#      context: ./backend
-#      args:
-#        - NGINX_VERSION=${NGINX_VERSION}
-#      dockerfile: dockerfile-nginx
-#    ports:
-#      - 30080:80
-#      # - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
-#    depends_on:
-#      - apiserver
-#    networks:
-#      - netpublic
-#
-#  dbdata:
-#    image: busybox
-#    volumes:
-#      - ./data/mysql/data:/var/lib/mysql/data
-#
+  toolsserver:
+    image: busybox
+
 #  testserver:
 #    env_file: ../.env
 #    image: python:3.10

@@ -2,13 +2,10 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 local: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build traefik apiserver
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build traefik apiserver appserver
 
 force: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate traefik apiserver
-
-localprod: ## Install server with its dependencies
-	docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml build && docker-compose -f docker-compose-prod.yml up --build traefik apiserver webserver appserver
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate traefik apiserver appserver
 
 traefik.go: ## Open service traefik with shell sh
 	docker-compose -f docker-compose-local.yml exec traefik sh
@@ -21,6 +18,12 @@ apiserver.go: ## Open service apiserver with shell bash
 
 apiserver.logs: ## Show logs from service apiserver
 	docker-compose -f docker-compose-local.yml logs apiserver
+
+appserver.go: ## Open service appserver with shell bash
+	docker-compose -f docker-compose-local.yml exec appserver bash
+
+appserver.logs: ## Show logs from service appserver
+	docker-compose -f docker-compose-local.yml logs appserver
 
 localserver.install: ## Install server with its dependencies
 	docker-compose -f docker-compose-local.yml run --rm apiserver poetry install
