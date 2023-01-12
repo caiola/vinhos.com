@@ -9,12 +9,12 @@ WORKDIR /app
 RUN pip install --upgrade pip setuptools wheel && pip install poetry
 
 # ERROR "you need a C compiler to build uWSGI"
-# ENV local does not need it
-# RUN apt-get -y install gcc
+RUN apt-get -y install gcc
 
 # We are using /mnt
 COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev
+COPY . .
 
-CMD ['flask', 'run', '--host 0.0.0.0']
+CMD [ "uwsgi", "--ini", "app.ini" ]
