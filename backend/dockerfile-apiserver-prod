@@ -15,6 +15,9 @@ RUN pip install --upgrade pip setuptools wheel && pip install poetry
 
 # We are using /mnt
 COPY poetry.lock pyproject.toml ./
+
+COPY . .
+
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev
 
