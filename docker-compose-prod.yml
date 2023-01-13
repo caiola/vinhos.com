@@ -70,10 +70,14 @@ services:
       context: backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
-      dockerfile: dockerfile-apiserver-dev
-    working_dir: /app
-    volumes:
-      - ./backend:/app
+      dockerfile: dockerfile-apiserver-prod
+    # PROD does not mount volumes, it copies everything to container
+    #working_dir: /app
+    #volumes:
+    #  - ./backend:/app
+
+
+
       #- ./data/api/server.log:/app/api/server.log
     #      - type: volume
     #        source: apiserver_logs
