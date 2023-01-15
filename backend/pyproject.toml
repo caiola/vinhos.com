@@ -13,6 +13,7 @@ flask-sqlalchemy = "^3.0.2"
 flasgger = "^0.9.5"
 uwsgi = "^2.0.21"
 pymysql = "^1.0.2"
+flask-migrate = "^4.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
