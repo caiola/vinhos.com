@@ -35,7 +35,6 @@ services:
       - "--certificatesResolvers.le.acme.tlschallenge=true"
       - "--accesslog=true"
       - "--log.level=DEBUG"
-      # - "--certificatesResolvers.le.acme.storage=/acme.json"
     ports:
       - "80:80"
       - "443:443"
@@ -67,7 +66,7 @@ services:
     container_name: apiserver
     env_file: .env
     build:
-      context: ./backend
+      context: backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
       dockerfile: dockerfile-apiserver-local

@@ -35,7 +35,6 @@ services:
       - "--certificatesResolvers.le.acme.tlschallenge=true"
       - "--accesslog=true"
       - "--log.level=DEBUG"
-      # - "--certificatesResolvers.le.acme.storage=/acme.json"
     ports:
       - "80:80"
       - "443:443"
@@ -75,14 +74,6 @@ services:
     #working_dir: /app
     #volumes:
     #  - ./backend:/app
-
-
-
-      #- ./data/api/server.log:/app/api/server.log
-    #      - type: volume
-    #        source: apiserver_logs
-    #        target: /app/api/server.log
-    #        read_only: false
     ports:
       - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
     environment:
@@ -124,47 +115,6 @@ services:
       - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
     networks:
       - netpublic
-
-#  webserver:
-#    hostname: webserver
-#    env_file: .env
-#    build:
-#      context: ./backend
-#      args:
-#        - NGINX_VERSION=${NGINX_VERSION}
-#      dockerfile: backend/dockerfile-nginx
-#    ports:
-#      - 30080:80
-#      # - ${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}
-#    depends_on:
-#      - apiserver
-#    networks:
-#      - netpublic
-#
-#  toolsserver:
-#    image: busybox
-#
-#  testserver:
-#    env_file: .env
-#    image: python:3.10
-#    working_dir: /app
-#    volumes:
-#      - ./backend:/app
-#    depends_on:
-#      - testdb
-#    ports:
-#      - 5053:5053
-#    environment:
-#      APPLICATION_PORT: 5053
-#      APPLICATION_DB_CONTAINER: testdb
-#    command: python -m pytest test/
-#    networks:
-#      - netpublic
-#
-#  testdb:
-#    image: oraclelinux:8-slim
-#    networks:
-#      - netpublic
 
 networks:
   netpublic:

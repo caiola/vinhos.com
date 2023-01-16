@@ -1,5 +1,4 @@
 ARG PYTHON_VERSION
-ARG API_SERVER_PORT_INTERNAL
 FROM python:3.10
 
 # Make a working directory in the image and set it as working dir.
@@ -21,4 +20,4 @@ COPY . .
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev
 
-CMD ["flask", "run", "--host", "0.0.0.0", "--port", "${API_SERVER_PORT_INTERNAL}"]
+CMD ["flask", "run", "--host", "0.0.0.0"]
