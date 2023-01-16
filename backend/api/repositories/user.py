@@ -1,6 +1,6 @@
 """ Defines the User repository """
 
-from models import User
+from api.models import User
 
 
 class UserRepository:

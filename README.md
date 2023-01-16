@@ -1,11 +1,33 @@
-# Flask Api Starter Kit [![CircleCI](https://circleci.com/gh/antkahn/flask-api-starter-kit/tree/master.svg?style=svg)](https://circleci.com/gh/antkahn/flask-api-starter-kit/tree/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/antkahn/flask-api-starter-kit/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/antkahn/flask-api-starter-kit/?branch=master)
+# Vinhos.com [![CircleCI](https://circleci.com/gh/antkahn/flask-api-starter-kit/tree/master.svg?style=svg)](https://circleci.com/gh/antkahn/flask-api-starter-kit/tree/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/antkahn/flask-api-starter-kit/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/antkahn/flask-api-starter-kit/?branch=master)
 
-This starter kit is designed to allow you to create very fast your Flask API.
+Welcome to Vinhos.com, the revolutionary open source platform for all things and wines!
+Our mission is to bring the wine industry into the 21st century by sharing knowledge and source code openly.
 
-The primary goal of this project is to remain as **unopinionated** as possible. Its purpose is not to dictate your project structure or to demonstrate a complete sample application, but to provide a set of tools intended to make back-end development robust, easy, and, most importantly, fun.
+With Vinhos.com, winemakers and wine enthusiasts alike can access a wealth of information and resources to help them create the perfect vintage.
 
-This starter kit comes with a [tutorial](https://github.com/antkahn/flask-api-starter-kit/blob/tutorial/doc/installation.md).
-Check it out if you want a quick tutorial on how to use Flask with this architecure.
+Whether you're a seasoned pro looking to improve your craft or a budding enthusiast looking to learn more about the art of winemaking, Vinhos.com has something for everyone.
+
+So join us on this journey of discovery and let's make a revolution together!
+
+## NOTE: Work in progress, documentation changes and instability is expected
+
+The primary goal of this project is to have a website working with API documented.
+
+## Architecture
+
+<svg width="600" height="300">
+  <rect x="20" y="20" width="120" height="120" rx="10" fill="#efefef" />
+  <rect x="180" y="20" width="120" height="120" rx="10" fill="#efefef" />
+  <rect x="340" y="20" width="120" height="120" rx="10" fill="#efefef" />
+  <rect x="20" y="160" width="120" height="120" rx="10" fill="#efefef" />
+  <rect x="180" y="160" width="120" height="120" rx="10" fill="#efefef" />
+  <text x="50" y="90" font-size="14" fill="#333333">Monitoring</text>
+  <text x="210" y="90" font-size="14" fill="#333333">Backoffice</text>
+  <text x="50" y="230" font-size="14" fill="#333333">Frontend</text>
+  <text x="210" y="230" font-size="14" fill="#333333">API</text>
+  <text x="370" y="90" font-size="14" fill="#333333">Database</text>
+</svg>
+
 
 ## Table of Contents
 
@@ -29,11 +51,18 @@ You will need [docker](https://docs.docker.com/engine/installation/) and [docker
 First, clone the project:
 
 ```bash
-$ git clone https://github.com/antkahn/flask-api-starter-kit.git <my-project-name>
+$ git clone https://github.com/caiola/vinhos.com.git <my-project-name>
 $ cd <my-project-name>
 ```
 
-Then install dependencies and check that it works
+## Local Development
+In order to run a local development environment:
+1. Copy `.env.sample` to a `.env` file and change values if needed
+2. `docker-compose up -d`
+3. `docker-compose exec app bash`
+4. To start a development server `flask run --host 0.0.0.0`
+
+## Local Deployment
 
 ```bash
 $ make server.install      # Install the pip dependencies on the docker container
@@ -171,4 +200,11 @@ The Swagger UI will be available [here](http://127.0.0.1:3000/apidocs/).
 ```
 pip install poetry
 poetry install
+```
+
+## To add networking and misc tools use docker image "image: busybox"
+
+```
+  tools:
+    image: busybox
 ```

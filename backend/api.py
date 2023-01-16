@@ -15,9 +15,9 @@ from flasgger import Swagger
 from flask import Flask
 from flask.blueprints import Blueprint
 
-import config
-import routes
-from models import db
+from api import config
+from api import routes
+from api.models import db
 
 # config your API specs
 # you can define multiple specs in the case your api has multiple versions

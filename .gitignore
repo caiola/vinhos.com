@@ -137,3 +137,13 @@ dmypy.json
 
 # vendor
 vendor
+
+# Backup files
+*.bak
+
+# Old files
+*.old
+
+# Zip files
+*.zip
+
