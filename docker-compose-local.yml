@@ -61,6 +61,12 @@ services:
     networks:
       - netpublic
 
+  db:
+    image: mariadb:10.6.11
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    env_file: .env
+
   apiserver:
     hostname: apiserver
     container_name: apiserver
@@ -94,6 +100,8 @@ services:
       - "traefik.http.routers.apiserver.tls.domains[0].main=${DOMAIN_VHOST_API}"
       - "traefik.http.services.apiserver.loadbalancer.server.port=${API_SERVER_PORT_INTERNAL}"
     command: flask run --host 0.0.0.0 --port ${API_SERVER_PORT_INTERNAL} --debugger --with-threads
+    depends_on:
+      - db
     networks:
       - netpublic
 
