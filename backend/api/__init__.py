@@ -1,9 +1,10 @@
-
+"""Application entrypoint"""
 from flasgger import Swagger
 from flask import Flask
 from flask.blueprints import Blueprint
 from api.models import db
 from api import routes
+from flask_migrate import Migrate
 
 def create_app(test_config=None):
 
@@ -29,6 +30,7 @@ def create_app(test_config=None):
 	app.config["SQLALCHEMY_DATABASE_URI"] = config.DB_URI
 	app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = config.SQLALCHEMY_TRACK_MODIFICATIONS
 	db.init_app(app)
+	Migrate(app, db)
 
 	# Route registration
 	app.register_blueprint(routes.USER_BLUEPRINT)
