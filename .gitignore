@@ -137,6 +137,7 @@ dmypy.json
 
 # vendor
 vendor
+data
 
 # Backup files
 *.bak
