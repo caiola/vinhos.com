@@ -11,8 +11,12 @@ pilot:
   dashboard: true
 
 log:
-  filePath: "/etc/traefik/applog.log"
   level: DEBUG
+  # filePath: "/var/log/log-file.log"
+
+# accessLog:
+#  filePath: "/var/log/log-access.log"
+#  bufferingSize: 100
 
 providers:
   docker:
@@ -40,7 +44,7 @@ certificatesResolvers:
   # letsencrypt:
   le:
     acme:
-      email: info@bigmarket.com
+      email: robccsilva@gmail.com
 #      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
       caServer: https://acme-v02.api.letsencrypt.org/directory
       storage: ./acme.json

@@ -1,0 +1,4 @@
+ARG TRAEFIK_VERSION
+ENV TRAEFIK_SSLEMAIL=example@example.com
+ENV TRAEFIK_BASIC_AUTH_USER_PASSWORD=default_password_is_replaced_here
+FROM traefik:3.0
