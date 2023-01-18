@@ -1,0 +1,11 @@
+ARG TRAEFIK_VERSION
+FROM traefik:latest
+
+COPY traefik.toml /etc/traefik/traefik.toml
+COPY acme.json /etc/traefik/acme.json
+
+EXPOSE 80
+EXPOSE 8080
+EXPOSE 443
+
+CMD ["traefik"]

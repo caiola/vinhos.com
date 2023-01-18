@@ -1,0 +1,120 @@
+# running docker-compose has requirements => make server.network
+# docker network create netpublic
+# docker-compose build --no-cache --pull && docker-compose up --force-recreate
+
+version: "3.9"
+services:
+  traefik:
+    image: traefik:${TRAEFIK_VERSION}
+    env_file: .env
+    ports:
+      - 80:80
+      - 443:443
+    hostname: traefik
+    container_name: traefik
+    environment:
+      - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
+      - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
+      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+      - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - TRAEFIK_SSLEMAIL=${TRAEFIK_SSLEMAIL}
+      - TRAEFIK_BASIC_AUTH_USER_PASSWORD=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}
+      - TZ=${TIMEZONE}
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker
+      # Do not expose containers unless explicitly told so
+      - --providers.docker.exposedByDefault=false
+      - --api
+      - --certificatesresolvers.le.acme.email=${TRAEFIK_SSLEMAIL?Variable not set}
+      - --certificatesresolvers.le.acme.storage=./acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - "--certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.le.org/directory"
+      - "--certificatesResolvers.le.acme.tlschallenge=true"
+      - "--accesslog=true"
+      - "--log.level=DEBUG"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./acme.json:/acme.json"
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      - "traefik.http.routers.traefik.rule=Host(`${DOMAIN_VHOST_BOARD}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=le"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.middlewares=authtraefik"
+      - "traefik.http.middlewares.authtraefik.basicauth.users=${TRAEFIK_BASIC_AUTH_USER_PASSWORD}"
+      # global redirect to https
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      # middleware redirect
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    restart: unless-stopped
+    networks:
+      - netpublic
+
+  apiserver:
+    hostname: apiserver
+    container_name: apiserver
+    env_file: .env
+    build:
+      context: backend
+      args:
+        - PYTHON_VERSION=${PYTHON_VERSION}
+      dockerfile: dockerfile-apiserver-dev
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - ${API_SERVER_PORT_EXTERNAL}:${API_SERVER_PORT_INTERNAL}
+    environment:
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - SERVICE_LOG=${SERVICE_LOG}
+      - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
+      - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
+      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+      - DOMAIN_VHOST_API=${DOMAIN_VHOST_API}
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apiserver.rule=Host(`${DOMAIN_VHOST_API}`)"
+      - "traefik.http.routers.apiserver.entrypoints=websecure"
+      - "traefik.http.routers.apiserver.tls=true"
+      - "traefik.http.routers.apiserver.tls.certresolver=le"
+      - "traefik.http.routers.apiserver.tls.domains[0].main=${DOMAIN_VHOST_API}"
+      - "traefik.http.services.apiserver.loadbalancer.server.port=${API_SERVER_PORT_INTERNAL}"
+    networks:
+      - netpublic
+
+  appserver:
+    image: containous/whoami:v1.5.0
+    hostname: appserver
+    container_name: appserver
+    env_file: .env
+    restart: unless-stopped
+    environment:
+      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+      - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
+      - "traefik.http.routers.appserver.entrypoints=websecure"
+      - "traefik.http.routers.appserver.tls=true"
+      - "traefik.http.routers.appserver.tls.certresolver=le"
+      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+    networks:
+      - netpublic
+
+networks:
+  netpublic:
+    external: true

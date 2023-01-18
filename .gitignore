@@ -109,6 +109,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.dev
+.env.qa
+.env.pre
+.env.prod
 
 # Spyder project settings
 .spyderproject
@@ -134,3 +138,13 @@ dmypy.json
 # vendor
 vendor
 data
+
+# Backup files
+*.bak
+
+# Old files
+*.old
+
+# Zip files
+*.zip
+
