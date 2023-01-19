@@ -105,24 +105,72 @@ services:
     networks:
       - netpublic
 
-  appserver:
-    image: containous/whoami:v1.5.0
-    hostname: appserver
-    container_name: appserver
+  vhostwww:
+    image: node:latest
     env_file: .env
-    restart: unless-stopped
-    environment:
-      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
-      - TZ=${TIMEZONE}
+    ports:
+      - "9001:9001"
+    volumes:
+      - "./frontend/www:/app"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
-      - "traefik.http.routers.appserver.entrypoints=websecure"
-      - "traefik.http.routers.appserver.tls=true"
-      - "traefik.http.routers.appserver.tls.certresolver=le"
-      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
-    networks:
-      - netpublic
+      - "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_WEB}`)"
+      - "traefik.http.routers.vhostwww.entrypoints=websecure"
+      - "traefik.http.routers.vhostwww.tls=true"
+      - "traefik.http.routers.vhostwww.tls.certresolver=le"
+      - "traefik.http.routers.vhostwww.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
+    command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+
+  vhostapp:
+    image: node:latest
+    env_file: .env
+    ports:
+      - "9002:9002"
+    volumes:
+      - "./frontend/app:/app"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vhostapp.rule=Host(`${DOMAIN_VHOST_APP}`)"
+      - "traefik.http.routers.vhostapp.entrypoints=websecure"
+      - "traefik.http.routers.vhostapp.tls=true"
+      - "traefik.http.routers.vhostapp.tls.certresolver=le"
+      - "traefik.http.routers.vhostapp.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+    command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+
+#  vhostbackoffice:
+#    image: node:latest
+#    env_file: .env
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - "./frontend/backoffice:/app"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_BACKOFFICE}`)"
+#      - "traefik.http.routers.appserver.entrypoints=websecure"
+#      - "traefik.http.routers.appserver.tls=true"
+#      - "traefik.http.routers.appserver.tls.certresolver=le"
+#      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
+#    command: sh -c "cd /app && npm install && npm run serve"
+
+#  appserver:
+#    image: containous/whoami:v1.5.0
+#    hostname: appserver
+#    container_name: appserver
+#    env_file: .env
+#    restart: unless-stopped
+#    environment:
+#      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+#      - TZ=${TIMEZONE}
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
+#      - "traefik.http.routers.appserver.entrypoints=websecure"
+#      - "traefik.http.routers.appserver.tls=true"
+#      - "traefik.http.routers.appserver.tls.certresolver=le"
+#      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+#    networks:
+#      - netpublic
 
   webserver:
     image: nginx/1.23.3

@@ -2,10 +2,10 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 local: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver appserver webserver traefik db
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver vhostwww vhostapp webserver traefik db
 
 local.force: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate apiserver appserver webserver traefik db
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate apiserver vhostwww vhostapp webserver traefik db
 
 local.traefik.go: ## Open service traefik with shell sh
 	docker-compose -f docker-compose-local.yml exec traefik sh
@@ -21,6 +21,24 @@ local.db.go: ## Open service db with shell sh
 
 local.db.logs: ## Show logs from service db
 	docker-compose -f docker-compose-local.yml logs db
+
+local.vhostwww.start: ## Start www.domain.tld
+	docker-compose -f docker-compose-local.yml up --build vhostwww
+
+local.vhostwww.go: ## Open service vhostwww with shell sh
+	docker-compose -f docker-compose-local.yml exec vhostwww sh
+
+local.vhostwww.logs: ## Show logs from service vhostwww
+	docker-compose -f docker-compose-local.yml logs vhostwww
+
+local.vhostapp.start: ## Start app.domain.tld
+	docker-compose -f docker-compose-local.yml up --build vhostapp
+
+local.vhostapp.go: ## Open service vhostapp with shell sh
+	docker-compose -f docker-compose-local.yml exec vhostapp sh
+
+local.vhostapp.logs: ## Show logs from service vhostapp
+	docker-compose -f docker-compose-local.yml logs vhostapp
 
 local.apiserver.go: ## Open service apiserver with shell bash
 	docker-compose -f docker-compose-local.yml exec apiserver bash

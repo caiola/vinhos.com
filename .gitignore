@@ -140,6 +140,14 @@ dmypy.json
 vendor
 data
 
+# node_modules
+frontend/app/.pnpm-store
+frontend/app/node_modules
+frontend/backoffice/.pnpm-store
+frontend/backoffice/node_modules
+frontend/www/.pnpm-store
+frontend/www/node_modules
+
 # Backup files
 *.bak
 
