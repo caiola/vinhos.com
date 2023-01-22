@@ -16,7 +16,7 @@ down_revision = '4f2e2c180af'
 
 def upgrade():
     op.create_table(
-        'user',
+        'users',
         sa.Column('first_name', sa.String(length=300), nullable=False),
         sa.Column('last_name', sa.String(length=300), nullable=False),
         sa.Column('age', sa.Integer(), nullable=True),
@@ -25,4 +25,4 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_table('user')
+    op.drop_table('users')

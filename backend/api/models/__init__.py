@@ -2,5 +2,5 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-from .user import User
+from .users import User
 from .adds import Add
