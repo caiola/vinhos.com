@@ -1,0 +1,3 @@
+FROM node:lts
+
+EXPOSE 9003

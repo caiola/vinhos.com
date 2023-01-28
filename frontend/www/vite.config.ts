@@ -36,9 +36,9 @@ export default defineConfig({
     ],
   },
   server: {
-    // watch: { usePolling: true },
-    // host: '0.0.0.0',
-    // port: 9001,
+   hmr: {
+        host: 'localhost',
+    },
     host: true,
     strictPort: true,
     port: 9001,

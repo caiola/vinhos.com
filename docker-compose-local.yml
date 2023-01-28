@@ -109,15 +109,15 @@ services:
     build:
       context: frontend/www
       args:
-        - PYTHON_VERSION=${PYTHON_VERSION}
+        - NODE_VERSION=${NODE_VERSION}
       dockerfile: dockerfile-vhostwww-dev
     env_file: .env
-    environment:
-      - NODE_ENV="development"
-      # The base node image sets a very verbose log level.
-      - ENV NPM_CONFIG_LOGLEVEL warn
+    #environment:
+      #- NODE_ENV="development"
+      # The base node image sets a very verbose log level. => ENV NPM_CONFIG_LOGLEVEL warn
+      #- NPM_CONFIG_LOGLEVEL warn
     ports:
-      - "9001:9001"
+      - "${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}"
     volumes:
       - "./frontend/www:/app"
     labels:
@@ -126,18 +126,22 @@ services:
       - "traefik.http.routers.vhostwww.entrypoints=websecure"
       - "traefik.http.routers.vhostwww.tls=true"
       - "traefik.http.routers.vhostwww.tls.certresolver=le"
-      # - "traefik.http.routers.vhostwww.tls.domains[1].main=${DOMAIN_VHOST_WEB}"
-      - "traefik.http.services.vhostwww.loadbalancer.server.port=9001"
+      - "traefik.http.routers.vhostwww.tls.domains[1].main=${DOMAIN_VHOST_WEB}"
+      - "traefik.http.services.vhostwww.loadbalancer.server.port=${WEB_SERVER_PORT_INTERNAL}"
       # - "traefik.http.services.vhostwww.loadbalancer.server.scheme=http"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
     networks:
       - netpublic
 
   vhostapp:
-    image: node:latest
+    build:
+      context: frontend/app
+      args:
+        - NODE_VERSION=${NODE_VERSION}
+      dockerfile: dockerfile-vhostapp-dev
     env_file: .env
     ports:
-      - "9002:9002"
+      - "${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}"
     volumes:
       - "./frontend/app:/app"
     labels:
@@ -146,7 +150,8 @@ services:
       - "traefik.http.routers.vhostapp.entrypoints=websecure"
       - "traefik.http.routers.vhostapp.tls=true"
       - "traefik.http.routers.vhostapp.tls.certresolver=le"
-      - "traefik.http.routers.vhostapp.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+      - "traefik.http.routers.vhostapp.tls.domains[2].main=${DOMAIN_VHOST_APP}"
+      - "traefik.http.services.vhostwww.loadbalancer.server.port=${APP_SERVER_PORT_INTERNAL}"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
     networks:
       - netpublic
