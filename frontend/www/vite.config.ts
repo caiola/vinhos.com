@@ -9,7 +9,7 @@ import { fileURLToPath, URL } from 'node:url'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue({ 
+    vue({
       template: { transformAssetUrls }
     }),
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
@@ -36,6 +36,14 @@ export default defineConfig({
     ],
   },
   server: {
-    port: 3000,
+    // watch: { usePolling: true },
+    // host: '0.0.0.0',
+    // port: 9001,
+    host: true,
+    strictPort: true,
+    port: 9001,
+    watch: {
+      usePolling: true
+    }
   },
 })

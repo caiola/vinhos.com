@@ -2,10 +2,10 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 local: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver vhostwww vhostapp webserver traefik db
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver vhostwww vhostapp traefik db
 
 local.force: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate apiserver vhostwww vhostapp webserver traefik db
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate apiserver vhostwww vhostapp traefik db
 
 local.traefik.go: ## Open service traefik with shell sh
 	docker-compose -f docker-compose-local.yml exec traefik sh

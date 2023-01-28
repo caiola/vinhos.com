@@ -106,8 +106,16 @@ services:
       - netpublic
 
   vhostwww:
-    image: node:latest
+    build:
+      context: frontend/www
+      args:
+        - PYTHON_VERSION=${PYTHON_VERSION}
+      dockerfile: dockerfile-vhostwww-dev
     env_file: .env
+    environment:
+      - NODE_ENV="development"
+      # The base node image sets a very verbose log level.
+      - ENV NPM_CONFIG_LOGLEVEL warn
     ports:
       - "9001:9001"
     volumes:
@@ -118,8 +126,12 @@ services:
       - "traefik.http.routers.vhostwww.entrypoints=websecure"
       - "traefik.http.routers.vhostwww.tls=true"
       - "traefik.http.routers.vhostwww.tls.certresolver=le"
-      - "traefik.http.routers.vhostwww.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
+      # - "traefik.http.routers.vhostwww.tls.domains[1].main=${DOMAIN_VHOST_WEB}"
+      - "traefik.http.services.vhostwww.loadbalancer.server.port=9001"
+      # - "traefik.http.services.vhostwww.loadbalancer.server.scheme=http"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+    networks:
+      - netpublic
 
   vhostapp:
     image: node:latest
@@ -136,6 +148,8 @@ services:
       - "traefik.http.routers.vhostapp.tls.certresolver=le"
       - "traefik.http.routers.vhostapp.tls.domains[0].main=${DOMAIN_VHOST_APP}"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+    networks:
+      - netpublic
 
 #  vhostbackoffice:
 #    image: node:latest
@@ -172,32 +186,32 @@ services:
 #    networks:
 #      - netpublic
 
-  webserver:
-    image: nginx/1.23.3
-    hostname: webserver
-    container_name: webserver
-    env_file: .env
-    build:
-      context: ./frontend
-      args:
-        - NGINX_VERSION=${NGINX_VERSION}
-      dockerfile: dockerfile-webserver-dev
-#    working_dir: /www
-#    #volumes:
-#    #  - ./frontend:/www
-#    restart: unless-stopped
-#    environment:
-#      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
-#      - TZ=${TIMEZONE}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.webserver.rule=Host(`${DOMAIN_VHOST_WEB}`)"
-      - "traefik.http.routers.webserver.entrypoints=websecure"
-      - "traefik.http.routers.webserver.tls=true"
-      - "traefik.http.routers.webserver.tls.certresolver=le"
-      - "traefik.http.routers.webserver.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
-    networks:
-      - netpublic
+#  webserver:
+#    image: nginx/1.23.3
+#    hostname: webserver
+#    container_name: webserver
+#    env_file: .env
+#    build:
+#      context: ./frontend
+#      args:
+#        - NGINX_VERSION=${NGINX_VERSION}
+#      dockerfile: dockerfile-webserver-dev
+##    working_dir: /www
+##    #volumes:
+##    #  - ./frontend:/www
+##    restart: unless-stopped
+##    environment:
+##      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+##      - TZ=${TIMEZONE}
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.webserver.rule=Host(`${DOMAIN_VHOST_WEB}1`)"
+#      - "traefik.http.routers.webserver.entrypoints=websecure"
+#      - "traefik.http.routers.webserver.tls=true"
+#      - "traefik.http.routers.webserver.tls.certresolver=le"
+#      - "traefik.http.routers.webserver.tls.domains[0].main=${DOMAIN_VHOST_WEB}1"
+#    networks:
+#      - netpublic
 
   toolsserver:
     image: busybox
@@ -227,3 +241,5 @@ services:
 networks:
   netpublic:
     external: true
+  netprivate:
+    external: false
