@@ -42,5 +42,9 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
-  },
+    // hmr: {
+    //     host: 'app.example.com',
+    //     port: '9012'
+    // },
+  }
 })

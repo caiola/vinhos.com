@@ -118,6 +118,7 @@ services:
       #- NPM_CONFIG_LOGLEVEL warn
     ports:
       - "${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}"
+      - "${WEB_HMR_SERVER_PORT_EXTERNAL}:${WEB_HMR_SERVER_PORT_INTERNAL}"
     volumes:
       - "./frontend/www:/app"
     labels:
@@ -126,10 +127,11 @@ services:
       - "traefik.http.routers.vhostwww.entrypoints=websecure"
       - "traefik.http.routers.vhostwww.tls=true"
       - "traefik.http.routers.vhostwww.tls.certresolver=le"
-      - "traefik.http.routers.vhostwww.tls.domains[1].main=${DOMAIN_VHOST_WEB}"
+      - "traefik.http.routers.vhostwww.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
       - "traefik.http.services.vhostwww.loadbalancer.server.port=${WEB_SERVER_PORT_INTERNAL}"
-      # - "traefik.http.services.vhostwww.loadbalancer.server.scheme=http"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+    # depends_on:
+    #  - apiserver
     networks:
       - netpublic
 
@@ -142,6 +144,7 @@ services:
     env_file: .env
     ports:
       - "${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}"
+      - "${APP_HMR_SERVER_PORT_EXTERNAL}:${APP_HMR_SERVER_PORT_INTERNAL}"
     volumes:
       - "./frontend/app:/app"
     labels:
@@ -150,27 +153,38 @@ services:
       - "traefik.http.routers.vhostapp.entrypoints=websecure"
       - "traefik.http.routers.vhostapp.tls=true"
       - "traefik.http.routers.vhostapp.tls.certresolver=le"
-      - "traefik.http.routers.vhostapp.tls.domains[2].main=${DOMAIN_VHOST_APP}"
-      - "traefik.http.services.vhostwww.loadbalancer.server.port=${APP_SERVER_PORT_INTERNAL}"
+      - "traefik.http.routers.vhostapp.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+      - "traefik.http.services.vhostapp.loadbalancer.server.port=${APP_SERVER_PORT_INTERNAL}"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+    # depends_on:
+    #  - apiserver
     networks:
       - netpublic
 
-#  vhostbackoffice:
-#    image: node:latest
-#    env_file: .env
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - "./frontend/backoffice:/app"
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_BACKOFFICE}`)"
-#      - "traefik.http.routers.appserver.entrypoints=websecure"
-#      - "traefik.http.routers.appserver.tls=true"
-#      - "traefik.http.routers.appserver.tls.certresolver=le"
-#      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
-#    command: sh -c "cd /app && npm install && npm run serve"
+  vhostbackoffice:
+    build:
+      context: frontend/backoffice
+      args:
+        - NODE_VERSION=${NODE_VERSION}
+      dockerfile: dockerfile-vhostbackoffice-dev
+    env_file: .env
+    ports:
+      - "${BACKOFFICE_SERVER_PORT_EXTERNAL}:${BACKOFFICE_SERVER_PORT_INTERNAL}"
+    volumes:
+      - "./frontend/backoffice:/app"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vhostbackoffice.rule=Host(`${DOMAIN_VHOST_BACKOFFICE}`)"
+      - "traefik.http.routers.vhostbackoffice.entrypoints=websecure"
+      - "traefik.http.routers.vhostbackoffice.tls=true"
+      - "traefik.http.routers.vhostbackoffice.tls.certresolver=le"
+      - "traefik.http.routers.vhostbackoffice.tls.domains[0].main=${DOMAIN_VHOST_BACKOFFICE}"
+      - "traefik.http.services.vhostbackoffice.loadbalancer.server.port=${BACKOFFICE_SERVER_PORT_INTERNAL}"
+    command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
+    # depends_on:
+    #  - apiserver
+    networks:
+      - netpublic
 
 #  appserver:
 #    image: containous/whoami:v1.5.0

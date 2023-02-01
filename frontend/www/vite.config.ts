@@ -36,14 +36,15 @@ export default defineConfig({
     ],
   },
   server: {
-   hmr: {
-        host: 'localhost',
-    },
     host: true,
     strictPort: true,
     port: 9001,
     watch: {
       usePolling: true
     }
-  },
+    // hmr: {
+    //     host: 'www.example.com',
+    //     port: '9011'
+    // },
+  }
 })
