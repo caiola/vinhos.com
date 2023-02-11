@@ -4,6 +4,12 @@ import uuid
 from api.models import Ad, User
 
 
+def list():
+    """Lists ads"""
+
+    return Ad.query.order_by(Ad.id.desc())
+
+
 def get_by(pk: int = None, uuid: uuid.UUID = None) -> Ad:
     """Query a user by last and first name"""
 
@@ -27,6 +33,6 @@ def update(ad: Ad, **kwargs) -> Ad:
 
 
 def create(user: User, title: str, description: str) -> Ad:
-    """Create a new ad assoicated to a user"""
+    """Create a new ad associated to a user"""
 
     return Ad(user=user, title=title, description=description).save()
