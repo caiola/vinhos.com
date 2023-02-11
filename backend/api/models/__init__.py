@@ -1,6 +1,11 @@
+import sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+from api.config import DB_URI
 
-from .users import User
+db = SQLAlchemy()
+engine = engine = sqlalchemy.create_engine(DB_URI)
+
+from .abc import BaseModel
 from .ads import Ad
+from .users import User

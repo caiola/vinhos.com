@@ -5,9 +5,8 @@ Revises: 51e2c29ad95
 Create Date: 2023-01-15 13:19:39.252497
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "6ecca4fcf65f"
@@ -21,9 +20,9 @@ def upgrade():
     op.create_table(
         "ads",
         sa.Column("id", sa.BigInteger(), nullable=False),
-        sa.Column("uuid", sa.String(length=32), nullable=True),
-        sa.Column("title", sa.String(length=100), nullable=True),
-        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("uuid", sa.String(length=50), nullable=False),
+        sa.Column("title", sa.String(length=100), nullable=False),
+        sa.Column("description", sa.Text(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###
