@@ -1,6 +1,8 @@
 import logging
 import os
+
 import pymysql
+
 pymysql.install_as_MySQLdb()
 
 DEBUG = os.getenv("ENVIRONMENT") == "DEV"
@@ -14,7 +16,7 @@ MYSQL = {
     "pw": os.environ["MYSQL_PASSWORD"],
     "host": os.environ["MYSQL_HOST"],
     "port": os.environ["MYSQL_PORT"],
-    "db": os.environ["MYSQL_DATABASE"]
+    "db": os.environ["MYSQL_DATABASE"],
 }
 DB_URI = "mysql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s" % MYSQL
 
