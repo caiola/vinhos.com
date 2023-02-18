@@ -25,6 +25,8 @@ pytest = "^7.2.0"
 safety = "^2.3.5"
 pytest-flask = "^1.2.0"
 pytest-faker = "^2.0.0"
+factory-boy = "^3.2.1"
+pytest-mock = "^3.10.0"
 
 [build-system]
 requires = ["poetry-core"]
