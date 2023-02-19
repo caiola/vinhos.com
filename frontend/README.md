@@ -14,7 +14,7 @@ https://backoffice.vinhos.com
 
 VHOST "app" is used for the mobile app
 
-https://backoffice.vinhos.com
+https://app.vinhos.com
 
 # Command: pnpm vite
 
