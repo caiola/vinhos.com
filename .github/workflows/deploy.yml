@@ -31,6 +31,8 @@ jobs:
           # source: ./build/*
           source: ./*
           target: ${{ secrets.WEB_SERVER_ROOT }}
+      - name: DEV - Deploy
+      - run: sh /opt/docker/deploy-dev.sh
 
   deploy-production:
     name: PROD - Deploy environment
