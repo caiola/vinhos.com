@@ -13,16 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     steps:
-      - uses: actions/checkout@v2
-      #- uses: actions/setup-node@v1
-      #  with:
-      #    node-version: 12
-      #- run: npm install
-      #- run: npm run build
+      - uses: actions/checkout@v3
       - name: DEV - Transfer files to server
-      #  run: |
-      #    scp -r build/* user@dev-server:/var/www/html
-      #    ssh user@dev-server "systemctl reload nginx"
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.WEB_SERVER_HOST }}
@@ -32,7 +24,7 @@ jobs:
           source: ./*
           target: ${{ secrets.WEB_SERVER_ROOT }}
       - name: DEV - Deploy
-      - run: sh /opt/docker/deploy-dev.sh
+        run: sh /opt/docker/deploy-dev.sh
 
   deploy-production:
     name: PROD - Deploy environment
