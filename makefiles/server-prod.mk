@@ -13,6 +13,15 @@ prod.traefik.go: ## Open service traefik with shell sh
 prod.traefik.logs: ## Show logs from service traefik
 	docker-compose -f docker-compose-prod.yml logs traefik
 
+local.vhostwww.start: ## Start www.domain.tld
+	docker-compose -f docker-compose-prod.yml up --build vhostwww
+
+local.vhostwww.go: ## Open service vhostwww with shell sh
+	docker-compose -f docker-compose-prod.yml exec vhostwww sh
+
+local.vhostwww.logs: ## Show logs from service vhostwww
+	docker-compose -f docker-compose-prod.yml logs vhostwww
+
 prod.apiserver.go: ## Open service apiserver with shell bash
 	docker-compose -f docker-compose-prod.yml exec apiserver bash
 
