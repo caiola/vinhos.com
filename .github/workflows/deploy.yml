@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     steps:
+      - name: Checkout
       - uses: actions/checkout@v3
-      - name: DEV - Transfer files to server
+
+      - name: Transfer files to server
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.WEB_SERVER_HOST }}
@@ -23,8 +25,14 @@ jobs:
           # source: ./build/*
           source: ./*
           target: ${{ secrets.WEB_SERVER_ROOT }}
-      - name: DEV - Deploy
-        run: sh /opt/docker/deploy-dev.sh
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.WEB_SERVER_SSH_PRIVATE_KEY }}
+
+      - name: Deploy code
+        run: ssh ${{ secrets.WEB_SERVER_USERNAME }}@${{ secrets.WEB_SERVER_HOST }} 'bash -s' < /opt/docker/deploy-dev.sh
 
   deploy-production:
     name: PROD - Deploy environment
