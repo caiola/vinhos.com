@@ -23,12 +23,24 @@ jobs:
           # source: ./build/*
           source: ./*
           target: ${{ secrets.WEB_SERVER_ROOT }}
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.0
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: ${{ secrets.WEB_SERVER_SSH_PRIVATE_KEY }}
-      - name: Deploy code
-        run: ssh ${{ secrets.WEB_SERVER_USERNAME }}@${{ secrets.WEB_SERVER_HOST }} 'bash -s' < /opt/docker/deploy-dev.sh
+          host: ${{ secrets.WEB_SERVER_HOST }}
+          username: ${{ secrets.WEB_SERVER_USERNAME }}
+          key: ${{ secrets.WEB_SERVER_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.WEB_SERVER_SSH_PORT }}
+          script: sh /opt/docker/deploy-dev.sh
+#      - name: Setup SSH
+#        uses: webfactory/ssh-agent@v0.5.0
+#        with:
+#          ssh-private-key: ${{ secrets.WEB_SERVER_SSH_PRIVATE_KEY }}
+#      - name: Deploy code
+#        run: |
+#          chmod +x /opt/docker/deploy-dev.sh
+#          /opt/docker/deploy-dev.sh
+#          shell: bash
+        # run: ssh ${{ secrets.WEB_SERVER_USERNAME }}@${{ secrets.WEB_SERVER_HOST }} 'bash -s' < /opt/docker/deploy-dev.sh
 
   deploy-production:
     name: PROD - Deploy environment
