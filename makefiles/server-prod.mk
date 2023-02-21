@@ -2,7 +2,7 @@
 # ¯¯¯¯¯¯¯¯¯¯¯
 
 prod: ## Install server with its dependencies
-	docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml build && docker-compose -f docker-compose-prod.yml up --build traefik apiserver vhostwww
+	docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml build && docker-compose -f docker-compose-prod.yml up -d --build traefik apiserver vhostwww
 
 prod.force: ## Install server with its dependencies
 	docker-compose -f docker-compose-prod.yml down && docker-compose -f docker-compose-prod.yml build --no-cache --pull && docker-compose -f docker-compose-prod.yml up -d --build --force-recreate traefik apiserver vhostwww
