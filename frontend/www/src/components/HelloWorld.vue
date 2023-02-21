@@ -7,7 +7,7 @@
         src="@/assets/logo.svg"
       />
 
-      <div class="text-body-2 font-weight-light mb-n1">Welcome to..</div>
+      <div class="text-body-2 font-weight-light mb-n1">Welcome to</div>
 
       <h1 class="text-h3 font-weight-bold">Vinhos.com</h1>
 
