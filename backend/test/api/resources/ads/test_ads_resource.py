@@ -123,3 +123,41 @@ def test_error_specify_bad_size_page(client, size):
     )
     assert response.status == "400 BAD REQUEST"
     assert response.get_json() == {"message": {"size": "Number of records per page"}}
+
+
+def test_successfully_retrieve_ad(client, ad):
+    """Successfully retrieves an ad"""
+    response = client.get(
+        f"/ads/{ad.uuid}",
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status == "200 OK"
+    assert response.get_json() == {
+        "uuid": str(ad.uuid),
+        "title": ad.title,
+        "description": ad.description,
+    }
+
+
+def test_fails_retrieve_unexistent_resource(session, random_uuid, client):
+    """Fails to retrieve a resource that does not exist"""
+    response = client.get(
+        f"/ads/{random_uuid}",
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status == "404 NOT FOUND"
+    assert response.get_json() == {
+        "message": "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
+    }
+
+
+@pytest.mark.parametrize("pk", (None, "-1", "1"))
+def test_fails_to_retrieve_bad_id(client, pk):
+    """Fails to retrieve a resource"""
+    response = client.get(
+        f"/ads/{pk}",
+        headers={"Content-Type": "application/json"},
+    )
+
+    assert response.status == "404 NOT FOUND"
+    assert response.get_json() is None

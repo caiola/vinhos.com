@@ -1,8 +1,10 @@
 import pytest
+import uuid
 from flask_migrate import upgrade as flask_migrate_upgrade
 
 from api import create_app
 from api.models import db as _db
+from test.factories import AdFactory
 
 
 @pytest.fixture(scope="session")
@@ -53,3 +55,13 @@ def session(db, request):
 
     request.addfinalizer(teardown)
     return db.session
+
+
+@pytest.fixture()
+def ad(session):
+    return AdFactory.create()
+
+
+@pytest.fixture()
+def random_uuid():
+    return uuid.uuid4()

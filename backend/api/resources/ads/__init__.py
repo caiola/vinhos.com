@@ -8,3 +8,4 @@ blueprint = Blueprint("ads", __name__)
 api = Api(blueprint)
 
 api.add_resource(AdsResource, "/ads/")
+api.add_resource(AdResource, "/ads/<uuid:pk>")

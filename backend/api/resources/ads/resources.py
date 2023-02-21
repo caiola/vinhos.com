@@ -1,6 +1,7 @@
 """Ads Restful resources"""
+import uuid
 from flask import url_for
-from flask_restful import Api, Resource, marshal_with, reqparse
+from flask_restful import Api, Resource, abort, marshal_with, reqparse
 
 from api.repositories import ads
 
@@ -40,3 +41,23 @@ class AdsResource(Resource):
             else None,
             "results": pagination.items,
         }
+
+    def post(self):
+        """Creates a resource"""
+        args = ads_resource_parser.parse_args()
+
+        args = ads_resource_parser.parse_args()
+        pagination = ads.list().paginate(page=args["page"], per_page=args["size"])
+
+
+class AdResource(Resource):
+    """Retrieves an add"""
+
+    @marshal_with(AdSerializer)
+    def get(self, pk: str):
+        """Retrieves a given resource"""
+
+        instance = ads.get_by(uuid=pk)
+        if not instance:
+            abort(404)
+        return instance

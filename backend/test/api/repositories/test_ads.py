@@ -59,3 +59,14 @@ def test_fail_create_add_duplicate_title(session, user, title, description):
     ad = Ad(user_id=user.id, title=title, description=description).save()
     with pytest.raises(IntegrityError):
         ad = ads.create(user, title, description)
+
+
+def test_get_by_success(ad):
+    """Successfully returns a specific add"""
+    record = ads.get_by(uuid=str(ad.uuid))
+    assert record.uuid == ad.uuid
+
+
+def test_get_by_resirce_not_exist(session, random_uuid):
+    """When a resource does not exist returns nil"""
+    assert ads.get_by(uuid=str(random_uuid)) is None

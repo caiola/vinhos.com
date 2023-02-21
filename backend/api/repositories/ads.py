@@ -1,4 +1,5 @@
 """ Defines the Ad repository """
+import sqlalchemy.exc
 import uuid
 
 from api.models import Ad, User
@@ -23,7 +24,10 @@ def get_by(pk: int = None, uuid: uuid.UUID = None) -> Ad:
     if pk:
         params["pk"] = pk
 
-    return Ad.query.filter_by(**params).one()
+    try:
+        return Ad.query.filter_by(**params).one()
+    except sqlalchemy.exc.NoResultFound:
+        return
 
 
 def update(ad: Ad, **kwargs) -> Ad:
