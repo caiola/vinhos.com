@@ -16,7 +16,7 @@
       <v-row class="d-flex align-center justify-center">
         <v-col cols="auto">
           <v-btn
-            href="#"
+            href="https://github.com/caiola/vinhos.com/"
             min-width="164"
             rel="noopener noreferrer"
             target="_blank"
@@ -28,7 +28,7 @@
               start
             />
 
-            Components
+            Open Source
           </v-btn>
         </v-col>
 
@@ -54,7 +54,7 @@
 
         <v-col cols="auto">
           <v-btn
-            href="https://github.com/caiola/vinhos.com/"
+            href="https://facebook.com/groups/vinhos.com"
             min-width="164"
             rel="noopener noreferrer"
             target="_blank"
