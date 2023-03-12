@@ -14,11 +14,11 @@ def parse_params(*arguments):
     """
 
     def parse(func):
-        """ Wrapper """
+        """Wrapper"""
 
         @wraps(func)
         def resource_verb(*args, **kwargs):
-            """ Decorated function """
+            """Decorated function"""
             parser = reqparse.RequestParser()
             for argument in arguments:
                 parser.add_argument(argument)
