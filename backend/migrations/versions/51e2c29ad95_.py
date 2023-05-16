@@ -6,23 +6,23 @@ Create Date: 2016-10-02 16:00:01.042947
 
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = '51e2c29ad95'
-down_revision = '4f2e2c180af'
+revision = "51e2c29ad95"
+down_revision = "4f2e2c180af"
 
 
 def upgrade():
     op.create_table(
-        'user',
-        sa.Column('first_name', sa.String(length=300), nullable=False),
-        sa.Column('last_name', sa.String(length=300), nullable=False),
-        sa.Column('age', sa.Integer(), nullable=True),
-        sa.PrimaryKeyConstraint('first_name', 'last_name')
+        "users",
+        sa.Column("id", sa.BigInteger(), nullable=False),
+        sa.Column("first_name", sa.String(length=50), nullable=False),
+        sa.Column("last_name", sa.String(length=50), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
     )
 
 
 def downgrade():
-    op.drop_table('user')
+    op.drop_table("users")
