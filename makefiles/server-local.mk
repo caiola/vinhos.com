@@ -41,7 +41,16 @@ local.vhostapp.logs: ## Show logs from service vhostapp
 	docker-compose -f docker-compose-local.yml logs vhostapp
 
 local.apiserver.go: ## Open service apiserver with shell bash
-	docker-compose -f docker-compose-local.yml exec apiserver bash
+	docker-compose -f docker-compose-local.yml exec apiserver sh
+
+local.apiserver.routes: ## Open service apiserver and run command to show routes
+	docker-compose -f docker-compose-local.yml exec apiserver flask routes
+
+local.apiserver.migrations: ## Run migrations
+	docker-compose -f docker-compose-local.yml exec apiserver flask db upgrade
+
+local.apiserver.run: ## Open service apiserver with shell bash
+	docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver
 
 local.apiserver.logs: ## Show logs from service apiserver
 	docker-compose -f docker-compose-local.yml logs apiserver
