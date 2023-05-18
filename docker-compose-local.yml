@@ -7,9 +7,6 @@ services:
   traefik:
     image: traefik:${TRAEFIK_VERSION}
     env_file: .env
-    ports:
-      - 80:80
-      - 443:443
     hostname: traefik
     container_name: traefik
     environment:
@@ -85,6 +82,8 @@ services:
       - FLASK_APP=${FLASK_APP}
       - FLASK_DEBUG=${FLASK_DEBUG}
       - SERVICE_LOG=${SERVICE_LOG}
+      - APPLICATION_HOST=${APPLICATION_HOST}
+      - APPLICATION_PORT=${APPLICATION_PORT}
       - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
       - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
       - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
@@ -99,7 +98,7 @@ services:
       - "traefik.http.routers.apiserver.tls.certresolver=le"
       - "traefik.http.routers.apiserver.tls.domains[0].main=${DOMAIN_VHOST_API}"
       - "traefik.http.services.apiserver.loadbalancer.server.port=${API_SERVER_PORT_INTERNAL}"
-    command: flask run --host 0.0.0.0 --port ${API_SERVER_PORT_INTERNAL} --debugger --with-threads
+    command: flask run --host ${APPLICATION_HOST} --port ${API_SERVER_PORT_INTERNAL} --debugger --with-threads
     depends_on:
       - db
     networks:
@@ -110,7 +109,7 @@ services:
       context: frontend/www
       args:
         - NODE_VERSION=${NODE_VERSION}
-      dockerfile: dockerfile-vhostwww-dev
+      dockerfile: dockerfile-vhostwww-local
     env_file: .env
     #environment:
       #- NODE_ENV="development"
@@ -140,7 +139,7 @@ services:
       context: frontend/app
       args:
         - NODE_VERSION=${NODE_VERSION}
-      dockerfile: dockerfile-vhostapp-dev
+      dockerfile: dockerfile-vhostapp-local
     env_file: .env
     ports:
       - "${APP_SERVER_PORT_EXTERNAL}:${APP_SERVER_PORT_INTERNAL}"
@@ -166,7 +165,7 @@ services:
       context: frontend/backoffice
       args:
         - NODE_VERSION=${NODE_VERSION}
-      dockerfile: dockerfile-vhostbackoffice-dev
+      dockerfile: dockerfile-vhostbackoffice-local
     env_file: .env
     ports:
       - "${BACKOFFICE_SERVER_PORT_EXTERNAL}:${BACKOFFICE_SERVER_PORT_INTERNAL}"

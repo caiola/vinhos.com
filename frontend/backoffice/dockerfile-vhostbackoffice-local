@@ -1,0 +1,7 @@
+FROM node:lts
+
+# Vite
+EXPOSE 9003
+
+# Vite HMR (Hot Module Reload)
+EXPOSE 9013

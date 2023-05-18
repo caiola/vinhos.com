@@ -1,7 +1,5 @@
 import logging
 from logging.config import fileConfig
-
-from __future__ import with_statement
 from alembic import context
 from flask import current_app
 
