@@ -1,1 +1,5 @@
 Single-database configuration for Flask.
+
+flask db upgrade
+
+flask db migrate -m "Add unique constraint to Ad model"
