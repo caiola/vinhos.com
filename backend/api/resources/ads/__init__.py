@@ -1,6 +1,8 @@
 """Ads Restful resources"""
-from flask import Blueprint
-from flask_restful import Api, Resource, marshal_with
+import traceback
+from flask import Blueprint, jsonify
+from flask_restful import Api
+from werkzeug.exceptions import HTTPException
 
 from .resources import AdResource, AdsResource
 
@@ -9,3 +11,32 @@ api = Api(blueprint)
 
 api.add_resource(AdsResource, "/ads/")
 api.add_resource(AdResource, "/ads/<uuid:pk>")
+
+"""
+Return internal server errors with JSON
+"""
+
+
+@blueprint.errorhandler(500)
+def internal_server_error(error):
+    response = {
+        "status": 500,
+        "error": "Internal Server Error",
+        "message": str(error),
+        "traceback": traceback.format_exc()
+    }
+    return jsonify(response), 500
+
+
+@blueprint.errorhandler(Exception)
+def handle_exception(e):
+    if isinstance(e, HTTPException):
+        return jsonify(error=str(e), status_code=e.code), e.code
+
+    response = {
+        "status": 500,
+        "error": "Internal Server Error",
+        "message": str(e),
+        "traceback": traceback.format_exc()
+    }
+    return jsonify(response), 500
