@@ -209,4 +209,24 @@ poetry install
     image: busybox
 ```
 
-## Test002
+## Database migrations
+
+Enter apiserver
+```
+# docker-compose -f docker-compose-local.yml exec apiserver sh
+make local.apiserver.go
+```
+
+Update migrations
+
+```
+flask db upgrade
+```
+
+Add a new database migration
+```
+flask db migrate -m "Add unique constraint to Ad model"
+```
+
+
+

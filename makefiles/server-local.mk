@@ -49,6 +49,9 @@ local.apiserver.routes: ## Open service apiserver and run command to show routes
 local.apiserver.migrations: ## Run migrations
 	docker-compose -f docker-compose-local.yml exec apiserver flask db upgrade
 
+local.apiserver.migrations.upgrade: ## Upgrade migrations
+	docker-compose -f docker-compose-local.yml exec apiserver sh -c "cd /app/ && flask db upgrade"
+
 local.apiserver.run: ## Open service apiserver with shell bash
 	docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver
 

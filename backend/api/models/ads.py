@@ -3,7 +3,7 @@ Define the Add model
 """
 import uuid
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, UniqueConstraint
 
 from . import db
 from .abc import BaseModel, MetaBaseModel
@@ -19,6 +19,10 @@ class Ad(db.Model, BaseModel, metaclass=MetaBaseModel):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text(), nullable=False)
     user_id = Column(db.BigInteger(), ForeignKey('users.id', name="ads_user_id_fk_users_id", onupdate="RESTRICT",
-                     ondelete="RESTRICT"), nullable=False)
+                                                 ondelete="RESTRICT"), nullable=False)
 
     user = relationship("User")
+
+    __table_args__ = (
+        UniqueConstraint('id', 'title', name='uq_id_title'),
+    )

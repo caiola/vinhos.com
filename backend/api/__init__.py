@@ -1,5 +1,4 @@
 """Application entrypoint"""
-from flasgger import Swagger
 from flask import Flask
 from flask_migrate import Migrate
 
