@@ -8,12 +8,13 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from .resources import AccountResource
 from jwt.exceptions import ExpiredSignatureError, DecodeError
+from werkzeug.exceptions import UnsupportedMediaType
 
-blueprint = Blueprint("accounts", __name__)
+blueprint = Blueprint("account", __name__)
 api = Api(blueprint)
 
 # Account management
-api.add_resource(AccountResource, "/account/")
+api.add_resource(AccountResource, "/account")
 
 """
 Global error handlers
@@ -39,6 +40,11 @@ def handle_exception(e):
     """
     Return internal server errors with JSON
     """
+    if isinstance(e, UnsupportedMediaType):
+        custom_response = {"success": False,
+                           "errors": [{"ref": "payload", "key": "invalid_json", "message": str(e)}]}
+        return jsonify(**custom_response), 401
+
     if isinstance(e, HTTPException):
         return jsonify(error=str(e), status_code=e.code), e.code
 

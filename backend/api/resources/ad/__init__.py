@@ -13,8 +13,8 @@ blueprint = Blueprint("ads", __name__)
 api = Api(blueprint)
 
 # Ad management
-api.add_resource(AdsResource, "/ads/")
-api.add_resource(AdResource, "/ads/<uuid:pk>")
+api.add_resource(AdsResource, "/ad/")
+api.add_resource(AdResource, "/ad/<uuid:pk>")
 
 """
 Global error handlers

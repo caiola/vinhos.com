@@ -39,7 +39,7 @@ class AuthCredentialResource(Resource):
             return None
 
     def post(self):
-        """Retrieves a given resource"""
+        """Retrieves credential"""
 
         # Setup parser with custom response
         resource_parser = CustomRequestParser(trim=True, bundle_errors=True)

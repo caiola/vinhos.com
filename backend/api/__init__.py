@@ -2,13 +2,13 @@
 import os
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 
 from api.models import db
 from api.resources.account import blueprint as account_blueprint
+from api.resources.ad import blueprint as ads_blueprint
 from api.resources.auth import blueprint as auth_blueprint
-from api.resources.ads import blueprint as ads_blueprint
-from flask_jwt_extended import JWTManager
 
 
 def create_app(test_config=None):
