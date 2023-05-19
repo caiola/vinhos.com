@@ -1,22 +1,14 @@
 """Ads Restful resources"""
 import json
-import os
 
-from flask import url_for, current_app, request, app
-from flask_restful import Api, Resource, abort, marshal_with, reqparse
+from flask_jwt_extended import JWTManager, create_access_token
+from flask import url_for, current_app, request
+from flask_restful import Resource, abort, marshal_with, reqparse
 
 from api.repositories import ads, accounts
 
 from .serializers import AdSerializer, ListSerializer, AccountSerializer
-from flask_jwt_extended import JWTManager, create_access_token
 
-from flask import Flask
-
-app = Flask(__name__)
-
-# Configure the Flask app for flask-jwt-extended
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-jwt = JWTManager(app)
 
 ads_resource_parser = reqparse.RequestParser()
 ads_resource_parser.add_argument(
@@ -94,10 +86,10 @@ class CustomRequestParser(reqparse.RequestParser):
         try:
             return super().parse_args(req, strict, http_error_code, bundle_errors)
         except Exception as e:
-            current_app.logger.info({"DVL-FUNCTION": "§LoginResource §CustomRequestParser"})
+            current_app.logger.debug({"DVL-FUNCTION": "§LoginResource §CustomRequestParser"})
 
             json_data = request.get_json()
-            current_app.logger.info({"json.data": json.dumps(json_data)})
+            current_app.logger.debug({"json.data": json.dumps(json_data)})
 
             validation_errors = LoginResource().validate_login_fields(json_data)
 

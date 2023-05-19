@@ -8,7 +8,11 @@ from api.models import db
 from api.resources.ads import blueprint as ads_blueprint
 from flask_jwt_extended import JWTManager
 
+
+
 def create_app(test_config=None):
+
+
     """Creates a Flask instance"""
     app = Flask(__name__)
     app.config.from_object("api.config")
@@ -25,4 +29,6 @@ def create_app(test_config=None):
 
     # Route registration
     app.register_blueprint(ads_blueprint)
+
     return app
+
