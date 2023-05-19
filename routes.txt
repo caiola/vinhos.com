@@ -1,0 +1,84 @@
+
+POST    /auth/credential                                                    Request a new credential for your application
+GET     /auth/refresh                                                       Refresh JWT token
+GET     /auth/current                                                       Get the current credential details
+GET     /auth/details                                                       Details about the current authentication (shows user roles)
+POST    /auth/logout                                                        Expire current credential
+GET     /auth/time                                                          Get the current time of the server, since UNIX epoch
+
+POST    /account                                                            User Registration (new account, user and store)
+GET     /account/countries                                                  All available countries
+GET     /account/area/districts/<country>                                   All available districts for a given country
+GET     /account/area/municipalities/<district>                             All available municipalities for a given district
+GET     /account/area/parishes/<municipality>                               All available parishes for a given municipality
+GET     /account/area/streets/<parish>                                      All available streets for a given parish
+
+TODO ROADMAP:
+
+GET     /me                                                                 Get details about your nichandle
+PUT     /me                                                                 Update details of your nichandle
+GET     /me/identity/user                                                   Retrieve all users of this account
+POST    /me/identity/user                                                   Create a new user
+DELETE  /me/identity/user/{user}                                            Delete this object
+GET     /me/identity/user/{user}                                            Get this object properties
+PUT     /me/identity/user/{user}                                            Alter a user
+POST    /me/identity/user/{user}/disable                                    Disable this user
+POST    /me/identity/user/{user}/enable                                     Enable this user
+
+GET     /me/contact                                                         Retrieve every contact your created
+POST    /me/contact                                                         Create a new contact
+
+POST    /me/change/email                                                    Initiate an email change procedure
+POST    /me/change/password                                                 Initiate a password change procedure
+
+POST    /store                                                              Create store
+POST    /store/<user-id>                                                    List stores of the user
+GET     /store/<id>                                                         Get store details
+
+GET     /store/contact                                                      List current customer contacts
+POST    /store/contact                                                      Create a 'marketplace' contact for current nic
+DELETE  /store/contact/{contactId}                                          Remove an existing contact
+GET     /store/contact/{contactId}                                          Get contact details
+PUT     /store/contact/{contactId}                                          Edit contact information
+
+
+GET     /me/notification/email/history                                      Retrieve every email sent to you
+GET     /me/notification/email/history/{id}                                 Retrieve information about an email
+GET     /me/notification/sms/history                                        Retrieve every sms sent to you
+GET     /me/notification/sms/history/{id}                                   Retrieve information about an sms
+GET     /me/notification/push/history                                       Retrieve every push notification sent to you
+GET     /me/notification/push/history/{id}                                  Retrieve information about an push notification
+
+GET     /me/order                                                           List of all the orders the logged account has
+GET     /me/order/{order-id}                                                Get this object properties
+GET     /me/order/{order-id}/associated                                     ObjectReturn main data about the object the processing of the order...
+GET     /me/order/{order-id}/available-registered-payment-mean              List of registered payment mean you can use to pay this order
+GET     /me/order/{order-id}/balance                                        List credit balances applied on this Order
+POST    /me/order/{order-id}/balance                                        Use a credit balance on this Order
+DELETE  /me/order/{order-id}/balance/{balance-name}                         Remove a credit balance from this Order
+GET     /me/order/{order-id}/balance/{balance-name}                         Get this object properties
+GET     /me/order/{order-id}/consumption/details                            Retrieve order's detailed consumption information as a file
+GET     /me/order/{order-id}/debt                                           Get this object properties
+GET     /me/order/{order-id}/debt/operation                                 All operations related to these debts
+GET     /me/order/{order-id}/debt/operation/{operation-id}                  Get this object properties
+GET     /me/order/{order-id}/debt/operation/{operation-id}/associated-object Return main data about the object related to this debt operation
+POST    /me/order/{order-id}/debt/pay                                       Create an order in order to pay this order's debt
+GET     /me/order/{order-id}/details                                        Give access to all entries of the order
+GET     /me/order/{order-id}/details/{order-detail-id}                      Get this object properties
+GET     /me/order/{order-id}/details/{order-detail-id}/extension            Get this object properties
+GET     /me/order/{order-id}/follow-up                                      Return tracking of the order
+POST    /me/order/{order-id}/pay                                            Pay with a payment method reference
+GET     /me/order/{order-id}/payment                                        Get this object properties
+GET     /me/order/{order-id}/payment-means                                  Return main data about the object the processing of the order...
+GET     /me/order/{order-id}/payment-methods                                List of registered payment method you can use to pay this order
+POST    /me/order/{order-id}/pay-with-registered-payment-mean               Pay with an already registered payment mean
+POST    /me/order/{order-id}/retraction                                     Request retraction of order
+GET     /me/order/{order-id}/status                                         Return status of order
+POST    /me/order/{order-id}/waiveRetraction                                Waive retraction period of order
+
+GET     /order/cart                                                         List of your order carts
+POST    /order/cart                                                         Create a new order cart
+DELETE  /order/cart/{cart-id}                                               Delete a cart
+GET     /order/cart/{cart-id}                                               Retrieve information about a specific cart
+PUT     /order/cart/{cart-id}                                               Modify information about a specific cart
+

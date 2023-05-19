@@ -1,14 +1,5 @@
 from flask_restful import fields
 
-AccountSerializer = {
-    "account_name": fields.String,
-    "company_name": fields.String
-}
-
-LoginSerializer = {
-    "token": fields.String
-}
-
 AdSerializer = {
     "uuid": fields.String,
     "title": fields.String,

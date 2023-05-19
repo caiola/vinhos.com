@@ -5,14 +5,13 @@ from flask import Flask
 from flask_migrate import Migrate
 
 from api.models import db
+from api.resources.account import blueprint as account_blueprint
+from api.resources.auth import blueprint as auth_blueprint
 from api.resources.ads import blueprint as ads_blueprint
 from flask_jwt_extended import JWTManager
 
 
-
 def create_app(test_config=None):
-
-
     """Creates a Flask instance"""
     app = Flask(__name__)
     app.config.from_object("api.config")
@@ -28,7 +27,8 @@ def create_app(test_config=None):
     Migrate(app, db)
 
     # Route registration
+    app.register_blueprint(account_blueprint)
     app.register_blueprint(ads_blueprint)
+    app.register_blueprint(auth_blueprint)
 
     return app
-

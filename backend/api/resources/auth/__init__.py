@@ -1,4 +1,4 @@
-"""Restful resources"""
+"""Auth Restful resources"""
 import traceback
 from flask import Blueprint, jsonify
 from flask_restful import Api
@@ -6,15 +6,21 @@ from werkzeug.exceptions import HTTPException
 
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_jwt_extended.exceptions import NoAuthorizationError
-from .resources import AdResource, AdsResource
 from jwt.exceptions import ExpiredSignatureError, DecodeError
 
-blueprint = Blueprint("ads", __name__)
+from api.resources.auth.resources import AuthCredentialResource, AuthRefreshResource, AuthCurrentResource, \
+    AuthDetailsResource, AuthLogoutResource, AuthTimeResource
+
+blueprint = Blueprint("auth", __name__)
 api = Api(blueprint)
 
-# Ad management
-api.add_resource(AdsResource, "/ads/")
-api.add_resource(AdResource, "/ads/<uuid:pk>")
+# Authentication management
+api.add_resource(AuthCredentialResource, "/auth/credential")
+api.add_resource(AuthRefreshResource, "/auth/refresh")
+api.add_resource(AuthCurrentResource, "/auth/current")
+api.add_resource(AuthDetailsResource, "/auth/details")
+api.add_resource(AuthLogoutResource, "/auth/logout")
+api.add_resource(AuthTimeResource, "/auth/time")
 
 """
 Global error handlers

@@ -6,15 +6,14 @@ from werkzeug.exceptions import HTTPException
 
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_jwt_extended.exceptions import NoAuthorizationError
-from .resources import AdResource, AdsResource
+from .resources import AccountResource
 from jwt.exceptions import ExpiredSignatureError, DecodeError
 
-blueprint = Blueprint("ads", __name__)
+blueprint = Blueprint("accounts", __name__)
 api = Api(blueprint)
 
-# Ad management
-api.add_resource(AdsResource, "/ads/")
-api.add_resource(AdResource, "/ads/<uuid:pk>")
+# Account management
+api.add_resource(AccountResource, "/account/")
 
 """
 Global error handlers
