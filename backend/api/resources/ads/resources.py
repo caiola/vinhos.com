@@ -1,9 +1,9 @@
 """Ads Restful resources"""
 from flask import url_for
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource, abort, marshal_with, reqparse
 
 from api.repositories import ads
-
 from .serializers import AdSerializer, ListSerializer
 
 ads_resource_parser = reqparse.RequestParser()
@@ -23,6 +23,7 @@ ads_resource_parser.add_argument(
 class AdsResource(Resource):
     """Cursors through ads"""
 
+    @jwt_required()
     @marshal_with(ListSerializer)
     def get(self):
         args = ads_resource_parser.parse_args()
@@ -41,6 +42,7 @@ class AdsResource(Resource):
             "results": pagination.items,
         }
 
+    @jwt_required()
     def post(self):
         """Creates a resource"""
         args = ads_resource_parser.parse_args()
@@ -50,6 +52,7 @@ class AdsResource(Resource):
 class AdResource(Resource):
     """Retrieves an add"""
 
+    @jwt_required()
     @marshal_with(AdSerializer)
     def get(self, pk: str):
         """Retrieves a given resource"""

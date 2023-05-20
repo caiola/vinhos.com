@@ -1,8 +1,7 @@
 """Accounts Restful resources"""
 
-from flask_restful import Resource, reqparse
-from werkzeug.exceptions import BadRequest
-from werkzeug.exceptions import HTTPException
+from flask_jwt_extended import jwt_required
+from flask_restful import reqparse
 
 from api.resources.base_resource import BaseResource
 
@@ -10,6 +9,7 @@ from api.resources.base_resource import BaseResource
 class AccountsResource(BaseResource):
     """Accounts management"""
 
+    @jwt_required()
     def post(self):
         """User Registration (new account, user and store)"""
 
@@ -27,6 +27,11 @@ class AccountsResource(BaseResource):
 
         if errors:
             return self.validate_payload(errors), 400
+
+        # @TODO User Registration (new account, user and store)
+
+        custom_response = {"msg":"account-created"}
+        return custom_response, 418
 
     def validate_payload(self, data):
         """Validate payload fields"""

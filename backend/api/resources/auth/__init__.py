@@ -4,7 +4,6 @@ from flask import Blueprint, jsonify
 from flask_restful import Api
 from werkzeug.exceptions import HTTPException
 
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from jwt.exceptions import ExpiredSignatureError, DecodeError
 
@@ -46,6 +45,11 @@ def handle_exception(e):
     """
     Return internal server errors with JSON
     """
+    if isinstance(e, UnsupportedMediaType):
+        custom_response = {"success": False,
+                           "errors": [{"ref": "payload", "key": "invalid_json", "message": str(e)}]}
+        return jsonify(**custom_response), 400
+
     if isinstance(e, HTTPException):
         return jsonify(error=str(e), status_code=e.code), e.code
 
