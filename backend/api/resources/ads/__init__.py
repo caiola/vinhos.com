@@ -12,9 +12,9 @@ from jwt.exceptions import ExpiredSignatureError, DecodeError
 blueprint = Blueprint("ads", __name__)
 api = Api(blueprint)
 
-# Ad management
-api.add_resource(AdsResource, "/ad/")
-api.add_resource(AdResource, "/ad/<uuid:pk>")
+# Ads management
+api.add_resource(AdsResource, "/ads")
+api.add_resource(AdResource, "/ads/<uuid:pk>")
 
 """
 Global error handlers
@@ -40,6 +40,11 @@ def handle_exception(e):
     """
     Return internal server errors with JSON
     """
+    if isinstance(e, UnsupportedMediaType):
+        custom_response = {"success": False,
+                           "errors": [{"ref": "payload", "key": "invalid_json", "message": str(e)}]}
+        return jsonify(**custom_response), 400
+
     if isinstance(e, HTTPException):
         return jsonify(error=str(e), status_code=e.code), e.code
 

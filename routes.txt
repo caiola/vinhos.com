@@ -6,12 +6,17 @@ GET     /auth/details                                                       Deta
 POST    /auth/logout                                                        Expire current credential
 GET     /auth/time                                                          Get the current time of the server, since UNIX epoch
 
-POST    /account                                                            User Registration (new account, user and store)
-GET     /account/countries                                                  All available countries
-GET     /account/area/districts/<country>                                   All available districts for a given country
-GET     /account/area/municipalities/<district>                             All available municipalities for a given district
-GET     /account/area/parishes/<municipality>                               All available parishes for a given municipality
-GET     /account/area/streets/<parish>                                      All available streets for a given parish
+POST    /accounts                                                           User Registration (new account, user and store)
+
+GET     /gis/countries                                                      All available countries
+GET     /gis/districts/<country>                                            All available districts for a given country
+GET     /gis/municipalities/<district>                                      All available municipalities for a given district
+GET     /gis/parishes/<municipality>                                        All available parishes for a given municipality
+GET     /gis/streets/<parish>                                               All available streets for a given parish
+
+POST    /ads                                                                Create ad
+GET     /ads                                                                List ads
+GET     /ads/<uuid:pk>                                                      Get ad details
 
 TODO ROADMAP:
 

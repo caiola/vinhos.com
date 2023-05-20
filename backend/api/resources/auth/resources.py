@@ -1,8 +1,9 @@
 """Auth restful resources"""
 import json
+import time
 
 from flask_jwt_extended import JWTManager, create_access_token
-from flask import current_app, request, jsonify
+from flask import current_app, request, jsonify, url_for
 from flask_restful import Resource, reqparse, abort
 from werkzeug.exceptions import BadRequest
 
@@ -122,4 +123,4 @@ class AuthTimeResource(Resource):
 
     def get(self):
         """Get the current time of the server, since UNIX epoch"""
-        return {"action": url_for("auth.time")}, 200
+        return {"action": url_for("auth.authtimeresource"), "time": time.time()}, 200

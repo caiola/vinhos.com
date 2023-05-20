@@ -6,8 +6,8 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 
 from api.models import db
-from api.resources.account import blueprint as account_blueprint
-from api.resources.ad import blueprint as ads_blueprint
+from api.resources.accounts import blueprint as accounts_blueprint
+from api.resources.ads import blueprint as ads_blueprint
 from api.resources.auth import blueprint as auth_blueprint
 
 
@@ -27,7 +27,7 @@ def create_app(test_config=None):
     Migrate(app, db)
 
     # Route registration
-    app.register_blueprint(account_blueprint)
+    app.register_blueprint(accounts_blueprint)
     app.register_blueprint(ads_blueprint)
     app.register_blueprint(auth_blueprint)
 
