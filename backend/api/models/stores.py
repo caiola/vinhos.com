@@ -7,7 +7,7 @@ from .database import Database
 from .status_type import StatusType
 
 
-class Stores(db.Model, BaseModel, metaclass=MetaBaseModel):
+class Store(db.Model, BaseModel, metaclass=MetaBaseModel):
     """The Store model"""
 
     __tablename__ = "store"

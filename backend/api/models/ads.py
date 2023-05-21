@@ -15,8 +15,15 @@ class Ad(db.Model, BaseModel, metaclass=MetaBaseModel):
     """The Ad model"""
 
     __tablename__ = "ad"
-    __table_args__ = {Database.ENGINE_KEY: Database.ENGINE_VALUE, Database.CHARSET_KEY: Database.CHARSET_VALUE,
-                      Database.COLLATION_KEY: Database.COLLATION_VALUE}
+    __table_args__ = (
+        {Database.ENGINE_KEY: Database.ENGINE_VALUE, Database.CHARSET_KEY: Database.CHARSET_VALUE,
+         Database.COLLATION_KEY: Database.COLLATION_VALUE},
+        UniqueConstraint('id', 'title', name='ad_unique_id_title')
+    )
+
+    user = db.relationship('User', backref=db.backref('ad', lazy=True))
+    store = db.relationship('Store', backref=db.backref('ad', lazy=True))
+    account = db.relationship('Account', backref=db.backref('ad', lazy=True))
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False, comment="Primary key")
     status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
@@ -34,9 +41,3 @@ class Ad(db.Model, BaseModel, metaclass=MetaBaseModel):
     user_id = Column(db.BigInteger(),
                      ForeignKey('user.id', name="ads_user_id_fk_user_id", onupdate="RESTRICT",
                                 ondelete="RESTRICT"), nullable=False, comment="User id")
-
-    user = relationship("User")
-
-    __table_args__ = (
-        UniqueConstraint('id', 'title', name='ad_unique_id_title'),
-    )

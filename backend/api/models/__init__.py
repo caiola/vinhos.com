@@ -7,6 +7,7 @@ db = SQLAlchemy()
 engine = sqlalchemy.create_engine(DB_URI)
 
 from .abc import BaseModel
-from .ads import Ad
-from .users import User
 from .accounts import Account
+from .stores import Store
+from .users import User
+from .ads import Ad

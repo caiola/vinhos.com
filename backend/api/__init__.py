@@ -8,6 +8,7 @@ from sqlalchemy.engine import Engine
 
 from api.models import db
 from api.resources.accounts import blueprint as accounts_blueprint
+from api.resources.stores import blueprint as store_blueprint
 from api.resources.ads import blueprint as ads_blueprint
 from api.resources.auth import blueprint as auth_blueprint
 from seeds.seed import seed_table_status
