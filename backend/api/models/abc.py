@@ -70,8 +70,15 @@ class BaseModel:
         }
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+            # session.refresh(self)
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
         return self
 
     def delete(self):

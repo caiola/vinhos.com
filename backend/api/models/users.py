@@ -17,12 +17,13 @@ class User(db.Model, BaseModel, metaclass=MetaBaseModel):
                       Database.COLLATION_KEY: Database.COLLATION_VALUE}
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
-    status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    status_id = db.Column(db.Integer(), default=StatusType.NEW.value, nullable=False, comment="Status id")
 
     first_name = db.Column(db.String(150), nullable=False, comment="First name")
     middle_name = db.Column(db.String(150), nullable=False, comment="Middle name")
     last_name = db.Column(db.String(150), nullable=False, comment="Last name")
 
+    # email = db.Column(db.String(128), nullable=False, comment="Email")
     password_hash = db.Column(db.String(128), nullable=False, comment="Password hash")
 
     def set_password(self, password):
