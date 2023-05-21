@@ -14,9 +14,9 @@ def seed_table_status(app):
 
         for status in statuses:
             status_instance = Status()
-            status_instance.id = getattr(StatusType, status)
+            status_instance.id = StatusType[status].value
             status_instance.name = status
-            status_instance.description = getattr(StatusDescription, status)
+            status_instance.description = StatusDescription[status].value
             db.session.add(status_instance)
 
         db.session.commit()

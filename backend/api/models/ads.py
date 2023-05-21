@@ -15,10 +15,11 @@ class Ad(db.Model, BaseModel, metaclass=MetaBaseModel):
     """The Ad model"""
 
     __tablename__ = "ad"
+
     __table_args__ = (
+        UniqueConstraint('id', 'title', name='ad_unique_id_title'),
         {Database.ENGINE_KEY: Database.ENGINE_VALUE, Database.CHARSET_KEY: Database.CHARSET_VALUE,
          Database.COLLATION_KEY: Database.COLLATION_VALUE},
-        UniqueConstraint('id', 'title', name='ad_unique_id_title')
     )
 
     user = db.relationship('User', backref=db.backref('ad', lazy=True))
