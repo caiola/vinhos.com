@@ -13,6 +13,10 @@ So join us on this journey of discovery and let's make a revolution together!
 
 The primary goal of this project is to have a website working with API documented.
 
+## Installation Guide
+[Installation Guide](./setup/installation.md)
+
+
 ## Architecture
 
 <svg width="600" height="300">

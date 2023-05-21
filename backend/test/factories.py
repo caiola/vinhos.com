@@ -1,7 +1,7 @@
 """Model Factories to use in tests"""
 import factory
 
-from api.models import Ad, User, db
+from api.models import Account, Store, User, Ad, db
 
 
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
