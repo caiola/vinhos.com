@@ -1,5 +1,6 @@
 import logging
 from logging.config import fileConfig
+
 from alembic import context
 from flask import current_app
 
@@ -28,6 +29,7 @@ def get_engine():
 # target_metadata = mymodel.Base.metadata
 config.set_main_option("sqlalchemy.url", str(get_engine().url).replace("%", "%%"))
 target_db = current_app.extensions["migrate"].db
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

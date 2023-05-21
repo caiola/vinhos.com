@@ -185,6 +185,9 @@ The code is formatted using [Black](https://github.com/python/black) and [Isort]
 ```bash
 $ make format.black # Apply Black on every file
 $ make format.isort # Apply Isort on every file
+
+# Some tests with flake8
+# docker run --rm -v $(pwd):/app alpine/flake8:latest sh -c "flake8 -v --color always --show-source --statistics --benchmark"
 ```
 
 ## Swagger
@@ -221,6 +224,12 @@ Update migrations
 
 ```
 flask db upgrade
+```
+
+Run seeds
+
+```
+flask seed_db
 ```
 
 Add a new database migration
