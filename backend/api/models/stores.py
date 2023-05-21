@@ -15,6 +15,26 @@ class Stores(db.Model, BaseModel, metaclass=MetaBaseModel):
                       Database.COLLATION_KEY: Database.COLLATION_VALUE}
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
-    id_status = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
-    store_name = db.Column(db.String(50), unique=True, nullable=False)
-    address_id = db.Column(db.String(50), nullable=False)
+    status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    address_id = db.Column(db.BigInteger(), nullable=False, comment="Address id")
+
+    store_name = db.Column(db.String(50), nullable=False, comment="Store name")
+
+    gps_latitude = db.Column(db.String(25), nullable=False, comment="GPS coordinates, latitude")
+    gps_longitude = db.Column(db.String(25), nullable=False, comment="GPS coordinates, longitude")
+
+    contact_email = db.Column(db.String(50), nullable=False, comment="Email")
+
+    contact_phone = db.Column(db.String(50), nullable=False, comment="Phone")
+    contact_phone_description = db.Column(db.String(50), nullable=False, comment="Phone description (e.g. call to land line)")
+
+    contact_phone_secondary = db.Column(db.String(50), nullable=False, comment="Secondary phone")
+    contact_phone_secondary_description = db.Column(db.String(50), nullable=False,
+                                                    comment="Secondary phone description (e.g. mobile phone)")
+
+    schedule = db.Column(db.String(50), nullable=False, comment="Open hours (e.g. Open 8h to 24h, Mon to Sat)")
+
+    social_facebook = db.Column(db.String(50), nullable=False, comment="Address for social network Facebook")
+    social_twitter = db.Column(db.String(50), nullable=False, comment="Address for social network Twitter")
+    social_instagram = db.Column(db.String(50), nullable=False, comment="Address for social network Instagram")
+    social_tiktok = db.Column(db.String(50), nullable=False, comment="Address for social network Tiktok")

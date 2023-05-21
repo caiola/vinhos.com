@@ -15,6 +15,11 @@ class Account(db.Model, BaseModel, metaclass=MetaBaseModel):
                       Database.COLLATION_KEY: Database.COLLATION_VALUE}
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
-    id_status = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    address_id = db.Column(db.BigInteger(), nullable=False, comment="Address id")
+
     account_name = db.Column(db.String(50), unique=True, nullable=False)
+
+    nif = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     company_name = db.Column(db.String(50), nullable=False)

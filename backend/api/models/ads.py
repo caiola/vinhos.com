@@ -19,7 +19,9 @@ class Ad(db.Model, BaseModel, metaclass=MetaBaseModel):
                       Database.COLLATION_KEY: Database.COLLATION_VALUE}
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False, comment="Primary key")
-    id_status = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    address_id = db.Column(db.BigInteger(), nullable=False, comment="Address id")
+
     uuid = db.Column(db.String(36), default=uuid.uuid4, unique=True, nullable=False, comment="UUID")
     title = db.Column(db.String(100), nullable=False, comment="Title")
     description = db.Column(db.Text(), nullable=False, comment="Description")
