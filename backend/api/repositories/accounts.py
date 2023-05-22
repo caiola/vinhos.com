@@ -1,17 +1,14 @@
 """ Defines the Account repository """
 import random
-from itertools import count
 
 from flask import abort
+from marshmallow import Schema, fields, validate, ValidationError
 
-from api.models import Account, User
+from api.models import Account
 from api.models.countries import Countries
 from api.models.status_type import StatusType
-# from marshmallow import validate, ValidationError
-from marshmallow import Schema, fields, validate, ValidationError, schema, EXCLUDE
-
+from api.repositories import stores
 from api.repositories import users
-from api.repositories.users import UserCreateSchema
 
 
 class AccountCreateSchema(Schema):
@@ -47,9 +44,7 @@ def update(account: Account, **kwargs) -> Account:
 
 def create(data: dict) -> Account:
     """
-    ###########################################################################
-    Create a new account
-    ###########################################################################
+    Create a new account, user and store
     """
 
     data_validation = {"email": data["email"]}
@@ -72,40 +67,30 @@ def create(data: dict) -> Account:
     }
 
     account = Account(**payload)
-    # store = Account(account_name=account_name, company_name=company_name)
-    # user = Account(account_name=account_name, company_name=company_name)
 
-    #return 'Last inserted id: ' + str(account.id)
-
-    #return account.save()
-    # return account_result = account.save()
-
-    # """
-    # Example of account_result:
-    # {
-    #     "msg": "account-created",
-    #     "data": {
-    #         "email": "robccsilva@gmail.com"
-    #     }
-    # }
-    # """
+    account_result = account.save(refresh=True)
+    account_id = account_result.id
 
     ############################################################################
     # Create a new store
     ############################################################################
-    print("create store...")
+
+    payload = {
+        "account_id": account_id,
+        "store_name": "store-" + str(random.randint(100000, 10000000)),
+    }
+
+    store_result = stores.create(payload)
 
     ############################################################################
     # Create a new user
     ############################################################################
-    print("create user...")
     payload = {
         # "status_id": StatusType.NEW.value,
-        "account_id": account.id,
+        "account_id": account_id,
         "email": data["email"]
     }
-    # user = User(**payload)
-    # user.create()
+
     user_result = users.create(payload)
 
     return user_result

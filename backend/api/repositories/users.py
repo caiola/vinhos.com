@@ -1,11 +1,16 @@
 """ Defines the User repository """
 import uuid
 
+from flask import abort
 from marshmallow import Schema, fields, validate, ValidationError, EXCLUDE
 from werkzeug.security import generate_password_hash
 
 from api.models import User
 from api.models.status_type import StatusType
+
+from sqlalchemy.exc import IntegrityError
+from pymysql.err import IntegrityError as PyMySQLIntegrityError
+import secrets
 
 
 class UserCreateSchema(Schema):
@@ -15,7 +20,7 @@ class UserCreateSchema(Schema):
                                        "invalid": "email-invalid-type",
                                        "type": "email-invalid-must-be-string"})
 
-    # first_name = fields.Str(required=False, validate=validate.Length(min=2, max=50))
+    # account_id = fields.Int(required=True)
 
 
 def get_by(pk: int = None, uuid: uuid.UUID = None) -> User:
@@ -40,26 +45,9 @@ def update(user: User, **kwargs) -> User:
     return user.save()
 
 
-# def create(first_name: str, last_name: str) -> User:
 def create(data: dict) -> User:
     """Create a new user"""
-    # You would normally get session from your SQLAlchemy DB instance, e.g., db.session if using Flask-SQLAlchemy
 
-    # data = {
-    #     "status_id": StatusType.NEW.value,
-    #     "first_name": user_info.get("first_name"),
-    #     "middle_name": user_info.get("middle_name"),
-    #     "last_name": user_info.get("last_name"),
-    #     # "email": user_info.get("email")
-    #     "password_hash": generate_password_hash("default.password")
-    # }
-    #
-    # user = User(**data)
-    # return user.save()
-
-    ############################################################################
-    # Create a new user
-    ###########################################################################
     data_validation = {
         "status_id": StatusType.NEW.value,
         "email": data["email"]
@@ -76,15 +64,26 @@ def create(data: dict) -> User:
 
     payload = {
         "status_id": StatusType.NEW.value,
+        "account_id": data["account_id"],
         "email": data["email"],
         "first_name": None,
         "middle_name": None,
         "last_name": None,
-        "password_hash": generate_password_hash("default.password")
+        # password is 16 bytes random -> 32 chars in hex
+        "password_hash": generate_password_hash(secrets.token_hex(16))
     }
 
     user = User(**payload)
-    # store = Account(account_name=account_name, company_name=company_name)
-    # user = Account(account_name=account_name, company_name=company_name)
 
-    user_result = user.save()
+    # Catch all exceptions because we dont want to log password_hash that is generated
+    try:
+        # refresh to get details after save
+        user_result = user.save(refresh=True)
+    except (IntegrityError, PyMySQLIntegrityError) as e:
+        user_result = None
+        abort(400, _("A user with this email already exists. Please use a different email."))
+    except Exception as e:
+        user_result = None
+        abort(400, _("Unknown exception"))
+
+    return user_result

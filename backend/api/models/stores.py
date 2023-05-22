@@ -16,6 +16,7 @@ class Store(db.Model, BaseModel, metaclass=MetaBaseModel):
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
     status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    account_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Account id")
     address_id = db.Column(db.BigInteger(), nullable=False, comment="Address id")
 
     store_name = db.Column(db.String(50), nullable=False, comment="Store name")
