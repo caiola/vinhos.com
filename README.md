@@ -240,6 +240,7 @@ Add a new database migration
 ```
 flask db migrate -m "Schema"
 flask db migrate -m "Add unique constraint to Ad model"
+flask db migrate -m "Add account changes"
 ```
 
 
