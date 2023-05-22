@@ -36,9 +36,16 @@ def create(user_info: dict) -> User:
     """Create a new user"""
     # You would normally get session from your SQLAlchemy DB instance, e.g., db.session if using Flask-SQLAlchemy
 
-    user_info["password_hash"] = generate_password_hash("default.password")
+    data = {
+        "status_id": StatusType.NEW.value,
+        "first_name": user_info.get("first_name"),
+        "middle_name": user_info.get("middle_name"),
+        "last_name": user_info.get("last_name"),
+        # "email": user_info.get("email")
+        "password_hash": generate_password_hash("default.password")
+    }
 
-    user = User(**user_info)
+    user = User(**data)
     return user.save()
 
     # @TODO Evaluate if it is better to to have code like below, to rollback on errors
@@ -63,7 +70,3 @@ def create(user_info: dict) -> User:
     #     session.close()
     #
     # return user
-
-
-
-

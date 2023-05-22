@@ -243,4 +243,29 @@ flask db migrate -m "Add unique constraint to Ad model"
 ```
 
 
+Poetry 
+```
+# Deprecated dependencies retturn this issue
+# poetry 'HTTPResponse' object has no attribute 'strict'
+# Need to do a reinstallation on the container
+
+make local.force
+
+# if container is running
+docker-compose -f docker-compose-local.yml exec apiserver sh -c "poetry lock"
+
+# container not running
+# linux
+# docker run -it --rm -v $(pwd):/app -w /app python:3.10 /bin/bash -c "pip install poetry && poetry lock"
+# windows
+# docker run -it --rm -v %cd%:/app -w /app python:3.10 /bin/bash -c "pip install poetry && poetry lock"
+
+# windows
+cd backend
+docker build -t img-local-poetry -f backend/dockerfile-apiserver-local ./backend
+docker run -it --rm -v %cd%:/app -w /app img-local-poetry /bin/bash -c "poetry lock"
+
+
+```
+
 
