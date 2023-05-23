@@ -35,15 +35,7 @@ class UsersResource(BaseResource):
 
         data = request.get_json()
 
-        user_info = {
-            "status_id": StatusType.NEW.value,
-            "first_name": data.get("first_name"),
-            "middle_name": data.get("middle_name"),
-            "last_name": data.get("last_name")
-            # "email": data.get("email")
-        }
-
-        users.create(user_info)
+        users.create(data)
 
         # Do not send password_hash
         user_info.pop("password_hash", None)

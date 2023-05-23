@@ -1,12 +1,26 @@
 """ Defines the User repository """
 import uuid
 
+from flask import abort
+from marshmallow import Schema, fields, validate, ValidationError, EXCLUDE
 from werkzeug.security import generate_password_hash
 
 from api.models import User
-from sqlalchemy.orm import Session
-
 from api.models.status_type import StatusType
+
+from sqlalchemy.exc import IntegrityError
+from pymysql.err import IntegrityError as PyMySQLIntegrityError
+import secrets
+
+
+class UserCreateSchema(Schema):
+    email = fields.Str(required=True,
+                       validate=validate.Email(error="email-invalid"),
+                       error_messages={"required": "email-required",
+                                       "invalid": "email-invalid-type",
+                                       "type": "email-invalid-must-be-string"})
+
+    # account_id = fields.Int(required=True)
 
 
 def get_by(pk: int = None, uuid: uuid.UUID = None) -> User:
@@ -31,39 +45,45 @@ def update(user: User, **kwargs) -> User:
     return user.save()
 
 
-# def create(first_name: str, last_name: str) -> User:
-def create(user_info: dict) -> User:
+def create(data: dict) -> User:
     """Create a new user"""
-    # You would normally get session from your SQLAlchemy DB instance, e.g., db.session if using Flask-SQLAlchemy
 
-    user_info["password_hash"] = generate_password_hash("default.password")
+    data_validation = {
+        "status_id": StatusType.NEW.value,
+        "email": data["email"]
+    }
 
-    user = User(**user_info)
-    return user.save()
+    # Instantiate the schema
+    schema = UserCreateSchema(unknown=EXCLUDE)
 
-    # @TODO Evaluate if it is better to to have code like below, to rollback on errors
-    # user = User()
-    # user.status_id = StatusType.NEW.value
-    # user.first_name = user_info["first_name"]
-    # user.middle_name = user_info["middle_name"]
-    # user.last_name = user_info["last_name"]
-    # user.email = user_info["email"]
-    #
-    # user.create(user_info)
+    # Validate an user data
+    try:
+        result = schema.load(data_validation)
+    except ValidationError as err:
+        abort(400, err.messages)
 
-    # session = Session()
-    # try:
-    #     session.add(user)
-    #     session.commit()
-    #     session.refresh(user)
-    # except:
-    #     session.rollback()
-    #     raise
-    # finally:
-    #     session.close()
-    #
-    # return user
+    payload = {
+        "status_id": StatusType.NEW.value,
+        "account_id": data["account_id"],
+        "email": data["email"],
+        "first_name": None,
+        "middle_name": None,
+        "last_name": None,
+        # password is 16 bytes random -> 32 chars in hex
+        "password_hash": generate_password_hash(secrets.token_hex(16))
+    }
 
+    user = User(**payload)
 
+    # Catch all exceptions because we dont want to log password_hash that is generated
+    try:
+        # refresh to get details after save
+        user_result = user.save(refresh=True)
+    except (IntegrityError, PyMySQLIntegrityError) as e:
+        user_result = None
+        abort(400, _("A user with this email already exists. Please use a different email."))
+    except Exception as e:
+        user_result = None
+        abort(400, _("Unknown exception"))
 
-
+    return user_result

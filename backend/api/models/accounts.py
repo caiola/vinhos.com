@@ -16,10 +16,11 @@ class Account(db.Model, BaseModel, metaclass=MetaBaseModel):
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
     status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
-    address_id = db.Column(db.BigInteger(), nullable=False, comment="Address id")
+    address_id = db.Column(db.BigInteger(), nullable=True, comment="Address id")
 
-    account_name = db.Column(db.String(50), unique=True, nullable=False)
+    account_name = db.Column(db.String(60), nullable=True, comment="Account can have any name, it is an internal reference")
 
-    nif = db.Column(db.String(50), nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    company_name = db.Column(db.String(50), nullable=False)
+    # Tax information
+    country = db.Column(db.String(2), nullable=True)
+    company_name = db.Column(db.String(50), nullable=True)
+    tax_number = db.Column(db.String(50), nullable=True)

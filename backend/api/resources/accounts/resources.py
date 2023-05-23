@@ -1,8 +1,9 @@
 """Accounts Restful resources"""
-
+from flask import request
 from flask_jwt_extended import jwt_required
 from flask_restful import reqparse
 
+from api.repositories import accounts
 from api.resources.base_resource import BaseResource
 
 
@@ -16,11 +17,11 @@ class AccountsResource(BaseResource):
         resource_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 
         # Add arguments
+        # resource_parser.add_argument(
+        #     "company_name", type=str, help="Company name is required", required=True, location="json"
+        # )
         resource_parser.add_argument(
-            "company_name", type=str, help="Company name is required", required=True, location="json"
-        )
-        resource_parser.add_argument(
-            "account_name", type=str, help="Account name is required", required=True, location="json"
+            "email", type=str, help="Email is required", required=True, location="json"
         )
 
         errors = self.execute_parse_args(resource_parser)
@@ -28,9 +29,14 @@ class AccountsResource(BaseResource):
         if errors:
             return self.validate_payload(errors), 400
 
-        # @TODO User Registration (new account, user and store)
+        data = request.get_json()
 
-        custom_response = {"msg":"account-created"}
+        accounts.create(data)
+
+        # Do not send password_hash
+        data.pop("password_hash", None)
+
+        custom_response = {"msg": "account-created", "data": data}
         return custom_response, 418
 
     def validate_payload(self, data):
@@ -38,12 +44,8 @@ class AccountsResource(BaseResource):
         result = []
         errors = data["message"]
 
-        if self.v(errors, "account_name"):
-            result.append(
-                {"ref": "account_name", "key": "account_name_is_required", "message": "Account name is required"})
-
-        if self.v(errors, "company_name"):
-            result.append({"ref": "company_name", "key": "company_is_required", "message": "Company name is required"})
+        if self.v(errors, "email"):
+            result.append({"ref": "email", "key": "email_is_required", "message": "Email is required"})
 
         if self.v(errors, "payload"):
             result.append(
