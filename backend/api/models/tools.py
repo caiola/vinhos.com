@@ -7,3 +7,5 @@ class utils:
             return data[key]
         except KeyError:
             return None
+        except Exception:
+            return None
