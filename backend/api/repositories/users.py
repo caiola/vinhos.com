@@ -1,16 +1,16 @@
 """ Defines the User repository """
+import secrets
 import uuid
 
 from flask import abort
 from marshmallow import Schema, fields, validate, ValidationError, EXCLUDE
+from pymysql.err import IntegrityError as PyMySQLIntegrityError
+from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
 from api.models import User
 from api.models.status_type import StatusType
-
-from sqlalchemy.exc import IntegrityError
-from pymysql.err import IntegrityError as PyMySQLIntegrityError
-import secrets
+from api.models.tools import utils
 
 
 class UserCreateSchema(Schema):
@@ -19,8 +19,6 @@ class UserCreateSchema(Schema):
                        error_messages={"required": "email-required",
                                        "invalid": "email-invalid-type",
                                        "type": "email-invalid-must-be-string"})
-
-    # account_id = fields.Int(required=True)
 
 
 def get_by(pk: int = None, uuid: uuid.UUID = None) -> User:
@@ -75,15 +73,22 @@ def create(data: dict) -> User:
 
     user = User(**payload)
 
+    user_errors = []
+
     # Catch all exceptions because we dont want to log password_hash that is generated
     try:
         # refresh to get details after save
         user_result = user.save(refresh=True)
     except (IntegrityError, PyMySQLIntegrityError) as e:
         user_result = None
-        abort(400, _("A user with this email already exists. Please use a different email."))
+        user_errors.append(
+            {"ref": "email", "message": "A user with this email already exists. Please use a different email."})
     except Exception as e:
         user_result = None
-        abort(400, _("Unknown exception"))
+        user_errors.append({"ref": "email", "message": "Unknown exception"})
 
-    return user_result
+    response = {}
+    response["user_id"] = utils.v(user_result, "user_id")
+    response["account_errors"] = user_errors
+
+    return response
