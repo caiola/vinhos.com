@@ -69,9 +69,17 @@ class BaseModel:
             for column in inspect(self.__class__).attrs
         }
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
+    def save(self, refresh=False):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            if refresh:
+                db.session.refresh(self)
+        except:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
         return self
 
     def delete(self):

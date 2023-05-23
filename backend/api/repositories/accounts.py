@@ -1,6 +1,23 @@
 """ Defines the Account repository """
+import random
+
+from flask import abort
+from marshmallow import Schema, fields, validate, ValidationError
 
 from api.models import Account
+from api.models.countries import Countries
+from api.models.status_type import StatusType
+from api.repositories import stores
+from api.repositories import users
+
+
+class AccountCreateSchema(Schema):
+    # email = fields.Str(required=True, validate=validate.Email(error='invalid-email'))
+    email = fields.Str(required=True,
+                       validate=validate.Email(error="email-invalid"),
+                       error_messages={"required": "email-required",
+                                       "invalid": "email-invalid-type",
+                                       "type": "email-invalid-must-be-string"})
 
 
 def get_by(pk: int = None, name: str = None) -> Account:
@@ -25,32 +42,55 @@ def update(account: Account, **kwargs) -> Account:
     return account.save()
 
 
-def create(account_name: str, company_name: str) -> Account:
-    """Create a new account"""
-    account = Account(account_name=account_name, company_name=company_name)
+def create(data: dict) -> Account:
+    """
+    Create a new account, user and store
+    """
 
-    return account.save()
+    data_validation = {"email": data["email"]}
 
-# import os
-#
-# from flask import Flask
-# from flask_jwt_extended import JWTManager, create_access_token
-#
-# from api.models import Ad, User, Account
-#
-# app = Flask(__name__)
-# app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")  # Set your own secret key
-# jwt = JWTManager(app)
+    # Instantiate the schema
+    schema = AccountCreateSchema()
 
+    # Validate an email
+    try:
+        result = schema.load(data_validation)
+    except ValidationError as err:
+        abort(400, err.messages)
 
-# @app.route("/login", methods=["POST"])
-# def login(username: str, password: str):
-#     # Assuming you have validated the user"s credentials and retrieved the user object
-#     # user = get_user()  # Replace this with your own logic
-#
-#     # Generate the access token
-#     # access_token = create_access_token(identity=user.id)
-#     access_token = create_access_token(identity=123)
-#
-#     # Return the access token as a response
-#     return {"access_token": access_token}, 200
+    payload = {
+        "status_id": StatusType.NEW.value,
+        "address_id": None,
+        "account_name": "account-" + str(random.randint(100000, 10000000)),
+        # User can change country later
+        "country": Countries.PT.name
+    }
+
+    account = Account(**payload)
+
+    account_result = account.save(refresh=True)
+    account_id = account_result.id
+
+    ############################################################################
+    # Create a new store
+    ############################################################################
+
+    payload = {
+        "account_id": account_id,
+        "store_name": "store-" + str(random.randint(100000, 10000000)),
+    }
+
+    store_result = stores.create(payload)
+
+    ############################################################################
+    # Create a new user
+    ############################################################################
+    payload = {
+        # "status_id": StatusType.NEW.value,
+        "account_id": account_id,
+        "email": data["email"]
+    }
+
+    user_result = users.create(payload)
+
+    return user_result

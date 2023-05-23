@@ -1,27 +1,31 @@
-"""Accounts Restful resources"""
+"""Users Restful resources"""
 from flask import request
 from flask_jwt_extended import jwt_required
 from flask_restful import reqparse
 
-from api.repositories import accounts
+from api.models.status_type import StatusType
+from api.repositories import users
 from api.resources.base_resource import BaseResource
 
 
-class AccountsResource(BaseResource):
-    """Accounts management"""
+class UsersResource(BaseResource):
+    """Users management"""
 
     @jwt_required()
     def post(self):
-        """User Registration (new account, user and store)"""
+        """User Registration (new user, user and store)"""
 
         resource_parser = reqparse.RequestParser(trim=True, bundle_errors=True)
 
         # Add arguments
-        # resource_parser.add_argument(
-        #     "company_name", type=str, help="Company name is required", required=True, location="json"
-        # )
         resource_parser.add_argument(
-            "email", type=str, help="Email is required", required=True, location="json"
+            "first_name", type=str, help="First name is required", required=True, location="json"
+        )
+        resource_parser.add_argument(
+            "middle_name", type=str, help="Middle name is required", required=True, location="json"
+        )
+        resource_parser.add_argument(
+            "last_name", type=str, help="Last name is required", required=True, location="json"
         )
 
         errors = self.execute_parse_args(resource_parser)
@@ -31,21 +35,25 @@ class AccountsResource(BaseResource):
 
         data = request.get_json()
 
-        accounts.create(data)
+        users.create(data)
 
         # Do not send password_hash
-        data.pop("password_hash", None)
+        user_info.pop("password_hash", None)
 
-        custom_response = {"msg": "account-created", "data": data}
-        return custom_response, 418
+        custom_response = user_info
+        return custom_response, 201
 
     def validate_payload(self, data):
         """Validate payload fields"""
         result = []
         errors = data["message"]
 
-        if self.v(errors, "email"):
-            result.append({"ref": "email", "key": "email_is_required", "message": "Email is required"})
+        if self.v(errors, "first_name"):
+            result.append(
+                {"ref": "first_name", "key": "first_name_is_required", "message": "First name is required"})
+
+        if self.v(errors, "last_name"):
+            result.append({"ref": "last_name", "key": "last_is_required", "message": "Last name is required"})
 
         if self.v(errors, "payload"):
             result.append(

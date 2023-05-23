@@ -13,6 +13,10 @@ So join us on this journey of discovery and let's make a revolution together!
 
 The primary goal of this project is to have a website working with API documented.
 
+## Installation Guide
+[Installation Guide](./setup/installation.md)
+
+
 ## Architecture
 
 <svg width="600" height="300">
@@ -185,6 +189,9 @@ The code is formatted using [Black](https://github.com/python/black) and [Isort]
 ```bash
 $ make format.black # Apply Black on every file
 $ make format.isort # Apply Isort on every file
+
+# Some tests with flake8
+# docker run --rm -v $(pwd):/app alpine/flake8:latest sh -c "flake8 -v --color always --show-source --statistics --benchmark"
 ```
 
 ## Swagger
@@ -223,10 +230,45 @@ Update migrations
 flask db upgrade
 ```
 
-Add a new database migration
+Run seeds
+
 ```
-flask db migrate -m "Add unique constraint to Ad model"
+flask seed_db
 ```
 
+Add a new database migration
+```
+flask db migrate -m "Schema"
+flask db migrate -m "Add unique constraint to Ad model"
+flask db migrate -m "Add account changes"
+flask db migrate -m "Add store field account_id"
+flask db migrate -m "Change store fields nullable to true"
+```
+
+
+Poetry 
+```
+# Deprecated dependencies retturn this issue
+# poetry 'HTTPResponse' object has no attribute 'strict'
+# Need to do a reinstallation on the container
+
+make local.force
+
+# if container is running
+docker-compose -f docker-compose-local.yml exec apiserver sh -c "poetry lock"
+
+# container not running
+# linux
+# docker run -it --rm -v $(pwd):/app -w /app python:3.10 /bin/bash -c "pip install poetry && poetry lock"
+# windows
+# docker run -it --rm -v %cd%:/app -w /app python:3.10 /bin/bash -c "pip install poetry && poetry lock"
+
+# windows
+cd backend
+docker build -t img-local-poetry -f backend/dockerfile-apiserver-local ./backend
+docker run -it --rm -v %cd%:/app -w /app img-local-poetry /bin/bash -c "poetry lock"
+
+
+```
 
 
