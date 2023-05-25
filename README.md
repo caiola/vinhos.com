@@ -13,6 +13,9 @@ So join us on this journey of discovery and let's make a revolution together!
 
 The primary goal of this project is to have a website working with API documented.
 
+## Sponsors
+[![Alt text](/docs/images/logo_moqups.png)](https://moqups.com/){:target="_blank"}
+
 ## Architecture
 
 <svg width="600" height="300">
