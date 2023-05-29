@@ -12,8 +12,7 @@ from api.resources.stores import blueprint as stores_blueprint
 from api.resources.users import blueprint as users_blueprint
 from api.resources.ads import blueprint as ads_blueprint
 from api.resources.auth import blueprint as auth_blueprint
-from seeds.seed import seed_table_status
-
+from seeds.seed import seed_tables
 
 
 def create_app(test_config=None):
@@ -47,4 +46,4 @@ app = create_app()
 @app.cli.command("seed_db")
 def seed_db():
     with app.app_context():
-        seed_table_status(app)
+        seed_tables(app)

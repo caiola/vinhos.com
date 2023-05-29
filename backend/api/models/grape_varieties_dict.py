@@ -8,8 +8,8 @@ from .database import Database
 
 class GrapeVarieties():
 
-    def all(self):
-        grape_varieties = {
+    def all():
+        grape_varieties = [
             {"id": 1, "name": "Alfrocheiro"},
             {"id": 2, "name": "Alicante Bouschet"},
             {"id": 3, "name": "Alicante Branco"},
@@ -129,7 +129,8 @@ class GrapeVarieties():
             {"id": 117, "name": "Vinhão"},
             {"id": 118, "name": "Viognier"},
             {"id": 119, "name": "Viosinho"},
-            {"id": 120, "name": "Vital"},
-        }
+            {"id": 120, "name": "Vital"}
+        ]
 
-        return grape_varieties
+        for variety in grape_varieties:
+            yield variety
