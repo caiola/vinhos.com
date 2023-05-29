@@ -1,0 +1,56 @@
+{
+  "id": 1111,
+  "name": "Herdade da Lisboa Infantes branco 2020",
+  "type": "Branco",
+  "region": "Alentejo",
+  "country": "PT",
+  "estate": "Herdade da Lisboa",
+  "estate_history": "History or description of the estate where the wine is produced (A Herdade da Lisboa...)",
+  "grape_varieties": [
+    "Antão Vaz",
+    "Arinto",
+    "Verdelho"
+  ],
+  "capacity": "75cl",
+  "alcohol_content": 12.5,
+  "price": 8.5,
+  "currency": "EUR",
+  "rating": 4.5,
+  "barcode": "",
+  "inventory": 0,
+  "description": "O Infantes branco é produzido a partir das uvas Antão Vaz, Arinto e Verdelho, que são colhidas e fermentadas individualmente. Segue-se um período de estágio de 4 meses em barricas de carvalho francês, com recurso à técnica de battonage. O resultado é um vinho de tonalidade esverdeada, límpida e brilhante. Este vinho tem um bouquet delicado com nuances de frutas cítricas e tropicais, proporcionando um paladar cremoso e um final refrescante.\n\nA propriedade Herdade da Lisboa, adquirida pela Família Cardoso em 2011, está situada na Vidigueira e concentra três atividades complementares: produção de vinho, de azeite e enoturismo. Durante as décadas de 1980 e 1990, a propriedade foi instrumental no aumento da reputação dos vinhos alentejanos através da marca Paço dos Infantes. Atualmente, a propriedade dispõe de 350 hectares no total, dos quais 100 hectares são dedicados ao cultivo de uvas, 200 hectares à produção de azeitonas e 10 hectares à fruticultura e horticultura, tudo isto seguindo as melhores práticas de produção sustentável.",
+  "images": {
+    "01": "https://example.com/wines/1111/1123456/image.jpg",
+    "02": "https://example.com/wines/1111/123214/image.jpg"
+  },
+  "food_pairing": [
+    "Peixe grelhado"
+  ],
+  "serving_temperature": "7-14ºC",
+  "vintage": [
+    "Information related to each vintage (colheita), which could be an array of dictionaries with information for each vintage."
+  ],
+  "available_vintages": [
+    "2019",
+    "2020"
+  ],
+  "producer": "Família Cardoso",
+  "winemaker": "Silva",
+  "awards": [
+    {
+      "name": "Wine Spectator's Top 100 Wines",
+      "year": 2019
+    },
+    {
+      "name": "Decanter World Wine Awards",
+      "year": 2020
+    }
+  ],
+  "sustainability_info": {
+    "organic": true,
+    "biodynamic": false,
+    "sustainable_farming": true
+  },
+  "created_at": "2023-01-01 00:00:00",
+  "updated_at": "2023-05-26 16:56:12"
+}
