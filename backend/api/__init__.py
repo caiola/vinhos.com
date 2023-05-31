@@ -11,6 +11,7 @@ from api.resources.accounts import blueprint as accounts_blueprint
 from api.resources.stores import blueprint as stores_blueprint
 from api.resources.users import blueprint as users_blueprint
 from api.resources.ads import blueprint as ads_blueprint
+from api.resources.regions import blueprint as ads_blueprint
 from api.resources.auth import blueprint as auth_blueprint
 from seeds.seed import seed_tables
 
