@@ -1,19 +1,20 @@
 """Restful resources"""
 import traceback
-from flask import Blueprint, jsonify
-from flask_restful import Api
-from werkzeug.exceptions import HTTPException
 
+from flask import Blueprint, jsonify
 from flask_jwt_extended.exceptions import NoAuthorizationError
-from .resources import RegionsResource
+from flask_restful import Api
 from jwt.exceptions import ExpiredSignatureError, DecodeError
-from werkzeug.exceptions import UnsupportedMediaType
+from werkzeug.exceptions import HTTPException, UnsupportedMediaType
+
+from .resources import RegionsResource, RegionsByCountryResource
 
 blueprint = Blueprint("regions", __name__)
 api = Api(blueprint)
 
 # Regions management
 api.add_resource(RegionsResource, "/regions")
+api.add_resource(RegionsByCountryResource, "/regions/<string:country>")
 
 """
 Global error handlers

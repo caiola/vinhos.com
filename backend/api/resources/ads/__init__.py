@@ -1,13 +1,14 @@
 """Restful resources"""
 
 import traceback
+
 from flask import Blueprint, jsonify
+from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_restful import Api
+from jwt.exceptions import ExpiredSignatureError, DecodeError
 from werkzeug.exceptions import HTTPException, UnsupportedMediaType
 
-from flask_jwt_extended.exceptions import NoAuthorizationError
 from .resources import AdResource, AdsResource
-from jwt.exceptions import ExpiredSignatureError, DecodeError
 
 blueprint = Blueprint("ads", __name__)
 api = Api(blueprint)

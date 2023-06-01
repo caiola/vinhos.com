@@ -1,9 +1,12 @@
 """
 Define the Wine Region model
 """
+from flask import json
+
 from . import db
 from .abc import BaseModel, MetaBaseModel
 from .database import Database
+
 
 
 class WineRegion(db.Model, BaseModel, metaclass=MetaBaseModel):
@@ -16,3 +19,7 @@ class WineRegion(db.Model, BaseModel, metaclass=MetaBaseModel):
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False, comment="Primary key")
     country = db.Column(db.String(2), nullable=False, comment="Country")
     name = db.Column(db.String(50), nullable=True, comment="Name of region")
+
+    # def toJson(self):
+    #     return json.dumps(self, default=lambda o: o.__dict__,
+    #                       sort_keys=True, indent=4)

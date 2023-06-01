@@ -1,6 +1,20 @@
 from flask_restful import fields
 
-AccountsSerializer = {
-    "account_name": fields.String,
-    "company_name": fields.String
+RegionSerializer = {
+    "id": fields.String,
+    "country": fields.String,
+    "name": fields.String
+}
+
+ListEntry = {
+    "id": fields.String,
+    "country": fields.String,
+    "name": fields.String
+}
+
+ListSerializer = {
+    "total": fields.Integer,
+    "previous": fields.String,
+    "next": fields.String,
+    "results": fields.List(fields.Nested(ListEntry)),
 }
