@@ -7,14 +7,13 @@ from flask_restful import Api
 from jwt.exceptions import ExpiredSignatureError, DecodeError
 from werkzeug.exceptions import HTTPException, UnsupportedMediaType
 
-from .resources import RegionsResource, RegionsByCountryResource
+from .resources import RegionsResource
 
 blueprint = Blueprint("regions", __name__)
 api = Api(blueprint)
 
 # Regions management
-api.add_resource(RegionsResource, "/regions")
-api.add_resource(RegionsByCountryResource, "/regions/<string:country>")
+api.add_resource(RegionsResource, "/regions", "/regions/<string:country>", endpoint="regionsresource")
 
 """
 Global error handlers

@@ -13,6 +13,7 @@ ListEntry = {
 }
 
 ListSerializer = {
+    "cid": fields.String,
     "total": fields.Integer,
     "previous": fields.String,
     "next": fields.String,

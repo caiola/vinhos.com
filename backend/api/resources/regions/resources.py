@@ -1,6 +1,6 @@
 """Regions Restful resources"""
 
-from flask import url_for, json
+from flask import url_for, current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import marshal_with, reqparse
 
@@ -15,7 +15,7 @@ list_resource_parser.add_argument(
 list_resource_parser.add_argument(
     "size",
     type=int,
-    default=10,
+    default=20,
     help="Number of records per page",
     required=False,
     location="args",
@@ -23,53 +23,25 @@ list_resource_parser.add_argument(
 
 
 class RegionsResource(BaseResource):
-    """Regions management"""
+    """Regions list"""
 
     @jwt_required()
     @marshal_with(ListSerializer)
-    def get(self):
-        # """Get all regions"""
+    def get(self, country=None):
+        """Get all regions by country if defined"""
         args = list_resource_parser.parse_args()
-        pagination = regions.list().paginate(page=args["page"], per_page=args["size"])
+        pagination = regions.list(country=country).paginate(page=args["page"], per_page=args["size"])
 
         return {
+            "cid": self.get_correlation_id(request.headers, args),
             "total": pagination.total,
             "previous": url_for(
-                "regions.regionsresource", page=args["page"] - 1, size=args["size"]
+                "regions.regionsresource", page=args["page"] - 1, size=args["size"], country=country
             )
             if pagination.has_prev
             else None,
-            "next": url_for("regions.regionsresource", page=args["page"] + 1, size=args["size"])
+            "next": url_for("regions.regionsresource", page=args["page"] + 1, size=args["size"], country=country)
             if pagination.has_next
             else None,
             "results": pagination.items,
         }
-
-
-#
-class RegionsByCountryResource(BaseResource):
-    """Get regions by country"""
-
-    def get(self, country):
-        """Get all regions by country"""
-
-        # result = list(regions.get_by_country(country=country))
-
-        # return result, 200
-
-        args = list_resource_parser.parse_args()
-        pagination = regions.list().paginate(page=args["page"], per_page=args["size"])
-
-        return json.dumps(list(pagination.items))
-        # return {
-        #     "total": pagination.total,
-        #     "previous": url_for(
-        #         "regions.regionsresource", page=args["page"] - 1, size=args["size"]
-        #     )
-        #     if pagination.has_prev
-        #     else None,
-        #     "next": url_for("regions.regionsresource", page=args["page"] + 1, size=args["size"])
-        #     if pagination.has_next
-        #     else None,
-        #     "results": pagination.items,
-        # }
