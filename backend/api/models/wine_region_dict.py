@@ -21,6 +21,7 @@ class WineRegions():
             {"id": 12, "country": "pt", "name": "Tejo"},
             {"id": 13, "country": "pt", "name": "Trás-os-Montes"},
             {"id": 14, "country": "pt", "name": "Vinho Verde"},
+            # {"id": 15, "country": "pt", "name": "Minho"},
         ]
 
         for region in regions:

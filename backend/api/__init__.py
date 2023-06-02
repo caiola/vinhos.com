@@ -11,7 +11,8 @@ from api.resources.accounts import blueprint as accounts_blueprint
 from api.resources.stores import blueprint as stores_blueprint
 from api.resources.users import blueprint as users_blueprint
 from api.resources.ads import blueprint as ads_blueprint
-from api.resources.regions import blueprint as ads_blueprint
+from api.resources.regions import blueprint as regions_blueprint
+from api.resources.categories import blueprint as categories_blueprint
 from api.resources.auth import blueprint as auth_blueprint
 from seeds.seed import seed_tables
 
@@ -36,6 +37,8 @@ def create_app(test_config=None):
     app.register_blueprint(stores_blueprint)
     app.register_blueprint(users_blueprint)
     app.register_blueprint(ads_blueprint)
+    app.register_blueprint(regions_blueprint)
+    app.register_blueprint(categories_blueprint)
     app.register_blueprint(auth_blueprint)
 
     return app
