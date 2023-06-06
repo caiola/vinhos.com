@@ -15,5 +15,3 @@ RUN apt-get -y install gcc
 COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false
 RUN poetry install
-
-CMD ['flask', 'run', '--host 0.0.0.0']

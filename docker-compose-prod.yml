@@ -69,7 +69,7 @@ services:
       context: backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
-      dockerfile: dockerfile-apiserver-prod
+      dockerfile: Dockerfile
     # PROD does not mount volumes, it copies everything to container
     #working_dir: /app
     #volumes:
