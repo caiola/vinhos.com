@@ -5,20 +5,23 @@ from flask import abort
 from marshmallow import Schema, fields, validate, ValidationError
 
 from api.models import Account
-from api.models.countries import Countries
 from api.models.status_type import StatusType
 from api.repositories import stores
 from api.repositories import users
 
+import pycountry
+
 
 class AccountCreateSchema(Schema):
-    # email = fields.Str(required=True, validate=validate.Email(error='invalid-email'))
     email = fields.Str(required=True,
                        validate=validate.Email(error="email-invalid"),
                        error_messages={"required": "email-required",
                                        "invalid": "email-invalid-type",
                                        "type": "email-invalid-must-be-string"})
-
+    country = fields.Str(required=True,
+                         validate=validate.OneOf(
+                            [item.alpha_2 for item in pycountry.countries],
+                            error="invalid-country"))
 
 def get_by(pk: int = None, name: str = None) -> Account:
     """Query a account by uuid or id"""

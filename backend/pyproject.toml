@@ -17,6 +17,7 @@ flask-migrate = "^4.0.1"
 pytest = "^7.2.1"
 flask-jwt-extended = "^4"
 marshmallow = "^3.19.0"
+pycountry = "^22.3.5"
 
 
 [tool.poetry.group.dev.dependencies]
