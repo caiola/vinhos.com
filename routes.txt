@@ -8,6 +8,8 @@ GET     /auth/time                                                          Get 
 
 POST    /accounts                                                           User Registration (new account, user and store)
 
+GET    /accounts                                                           User Registration (new account, user and store)
+
 GET     /gis/countries                                                      All available countries
 GET     /gis/districts/<country>                                            All available districts for a given country
 GET     /gis/municipalities/<district>                                      All available municipalities for a given district
@@ -17,6 +19,85 @@ GET     /gis/streets/<parish>                                               All 
 POST    /ads                                                                Create ad
 GET     /ads                                                                List ads
 GET     /ads/<uuid:pk>                                                      Get ad details
+
+
+MOCKS
+
+GET /ads                                                                    Retrieve a list of all wines available in the shop.                 https://stoplight.io/mocks/vinhoscom/vinhoscom/185282964/ads
+GET /ads/{id}                                                               Retrieve detailed information about a specific wine by its ID.      https://stoplight.io/mocks/vinhoscom/vinhoscom/185282964/ads/1
+POST /ads Add a new wine to the shop's inventory.
+PUT /ads/{id} Update the details of a specific wine.
+DELETE /ads/{id} Delete a specific wine from the inventory.
+GET /ads/types Retrieve a list of all wine types (red, white, rosé, etc.) available.
+GET /ads/regions Retrieve a list of all wine regions (Bordeaux, Napa Valley, Tuscany, etc.) available.
+GET /ads/grape-varieties Retrieve a list of all grape varieties (Merlot, Chardonnay, Cabernet Sauvignon, etc.) available.
+GET /ads/prices Retrieve a list of all wine prices available.
+GET /ads/top-rated Retrieve a list of top-rated wines based on customer reviews or ratings.
+GET /ads/inventory Retrieve a list of wines currently in stock.
+GET /ads/discounts Retrieve a list of wines currently on discount or promotion.
+GET /ads/search?q={query} Search for wines based on a specific query.
+GET /ads/filter?type={type} Filter wines by type (red, white, rosé, etc.).
+GET /ads/filter?region={region} Filter wines by region (Bordeaux, Napa Valley, Tuscany, etc.).
+GET /ads/filter?variety={variety} Filter wines by grape variety (Merlot, Chardonnay, Cabernet Sauvignon, etc.).
+GET /ads/filter?price={price_range} Filter wines by price range (e.g., $10-$20, $20-$50, etc.).
+GET /ads/suggestions Retrieve a list of wine recommendations based on customer preferences or purchase history.
+GET /ads/{id}/reviews Retrieve customer reviews for a specific wine.
+POST /ads/{id}/reviews Add a customer review for a specific wine.
+GET /ads/{id}/ratings Retrieve average ratings for a specific wine.
+POST /ads/{id}/ratings Add a rating for a specific wine.
+GET /ads/featured Retrieve a list of featured wines or wine of the month.
+GET /ads/new-arrivals Retrieve a list of recently added wines to the inventory.
+GET /ads/popular Retrieve a list of popular wines based on sales or customer demand.
+GET /ads/{id}/similar Retrieve a list of wines similar to a specific wine.
+GET /ads/stock-status Retrieve the current stock status of all wines.
+GET /ads/{id}/availability Check the availability of a specific wine.
+GET /ads/offers Retrieve a list of special offers or deals on wines.
+GET /ads/{id}/image Retrieve the image of a specific wine.
+GET /ads/{id}/description Retrieve the description of a specific wine.
+GET /ads/{id}/food-pairing Retrieve food pairing suggestions for a specific wine.
+GET /ads/{id}/vintage Retrieve the vintage information of a specific wine.
+GET /ads/brands Retrieve a list of wine brands available in the shop.
+GET /ads/brands/{name} Retrieve detailed information about a specific wine brand by its name.
+GET /ads/labels Retrieve a list of wine labels available in the shop.
+GET /ads/labels/{name} Retrieve detailed information about a specific wine label by its name.
+GET /ads/suppliers Retrieve a list of wine suppliers or distributors.
+GET /ads/suppliers/{id} Retrieve detailed information about a specific wine supplier by its ID.
+GET /ads/recommendations/{id} Get personalized wine recommendations for a specific customer based on their profile.
+GET /ads/featured-region Retrieve a list of featured wines from a specific region.
+GET /ads/top-winemakers Retrieve a list of top-rated winemakers or vineyards.
+GET /ads/top-sellers Retrieve a list of top-selling wines.
+GET /ads/stock-alerts Retrieve a list of wines with low stock or out of stock status.
+GET /ads/{id}/similar-wines-by-price Retrieve a list of wines similar to a specific wine based on price range.
+GET /ads/tastings Retrieve a list of upcoming wine tasting events or promotions.
+GET /ads/tastings/{id} Retrieve detailed information about a specific wine tasting event by its ID.
+GET /ads/regions/{region}/ads Retrieve a list of wines available from a specific region.
+GET /ads/types/{type}/ads Retrieve a list of wines of a specific type (red, white, rosé, etc.).
+GET /ads/regions/{region}/top-rated Retrieve a list of top-rated wines from a specific region.
+GET /ads/{id}/stock Retrieve the current stock quantity of a specific wine.
+GET /ads/{id}/related-products Retrieve a list of related products (accessories, gift sets, etc.) for a specific wine.
+GET /ads/{id}/availability-stores Retrieve a list of stores or locations where a specific wine is available.
+GET /ads/special-orders Retrieve a list of wines available for special order or pre-order.
+GET /ads/{id}/age-restrictions Retrieve age restrictions or legal requirements for purchasing a specific wine.
+GET /ads/{id}/sommelier-suggestions Retrieve wine recommendations or suggestions from a sommelier for a specific wine.
+GET /ads/{id}/awards Retrieve a list of awards or accolades received by a specific wine.
+GET /ads/top-rated-by-region Retrieve a list of top-rated wines from each wine region.
+GET /ads/{id}/production-details Retrieve detailed production information for a specific wine (fermentation, aging, vineyard details, etc.).
+GET /ads/price-range/{min}/{max} Retrieve a list of wines within a specific price range.
+GET /ads/{id}/purchase-history Retrieve the purchase history of a specific wine (customer names, dates, quantities, etc.).
+GET /ads/{id}/similar-tasting-profile Retrieve a list of wines with a similar tasting profile to a specific wine.
+GET /ads/{id}/varietal-composition Retrieve the varietal composition or blend details for a specific wine.
+GET /ads/{id}/cellar-details Retrieve cellar storage recommendations (temperature, humidity, aging potential, etc.) for a specific wine.
+GET /ads/{id}/availability-online Check the availability of a specific wine for online purchase.
+GET /ads/{id}/drinkability Retrieve information on the optimal drinking window or aging potential for a specific wine.
+GET /ads/stock-status-by-region Retrieve the current stock status of wines by region.
+GET /ads/price-statistics Retrieve statistical information on wine prices (average, minimum, maximum, etc.).
+GET /ads/{id}/sustainability-info Retrieve information on sustainability practices or certifications for a specific wine.
+GET /ads/recommendations/food-pairing/{meal} Get wine recommendations based on a specific meal or dish.
+GET /ads/labels/{name}/ads Retrieve a list of wines associated with a specific wine label.
+GET /ads/{id}/availability-stores/{location} Check the availability of a specific wine in a particular store or location.
+GET /ads/{id}/cellar-location Retrieve the location or aisle details of a specific wine in the shop's cellar.
+GET /ads/vintages/{year} Retrieve a list of wines from a specific vintage year.
+GET /ads/{id}/availability-online-stores Retrieve a list of online stores or platforms where a specific wine is available for purchase.
 
 TODO ROADMAP:
 

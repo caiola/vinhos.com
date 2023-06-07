@@ -13,6 +13,11 @@ So join us on this journey of discovery and let's make a revolution together!
 
 The primary goal of this project is to have a website working with API documented.
 
+## Sponsors
+[![Alt text](/docs/images/logo_moqups.png)](https://moqups.com/)
+Sponsored a free subscription for one year.
+
+
 ## Installation Guide
 [Installation Guide](./setup/installation.md)
 
@@ -242,7 +247,8 @@ flask db migrate -m "Schema"
 flask db migrate -m "Add unique constraint to Ad model"
 flask db migrate -m "Add account changes"
 flask db migrate -m "Add store field account_id"
-flask db migrate -m "Change store fields nullable to true"
+flask db migrate -m "Add table grape variety"
+flask db migrate -m "Change grape variety field name"
 ```
 
 

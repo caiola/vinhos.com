@@ -13,6 +13,7 @@ import pycountry
 
 
 class AccountCreateSchema(Schema):
+    # account_name = fields.Str(required=True, error="Invalid account name")
     email = fields.Str(required=True,
                        validate=validate.Email(error="email-invalid"),
                        error_messages={"required": "email-required",
@@ -48,9 +49,7 @@ def update(account: Account, **kwargs) -> Account:
 def registration(data: dict):
     response = {}
 
-    # ############################################################################
     # Create a new account
-    # ############################################################################
     payload = {
         "email": utils.v(data, "email")
     }
@@ -58,9 +57,7 @@ def registration(data: dict):
 
     response["account"] = account_result
 
-    # ############################################################################
     # Create a new store
-    # ############################################################################
 
     payload = {
         "account_id": utils.v(account_result, "account_id"),
@@ -71,9 +68,7 @@ def registration(data: dict):
 
     response["store"] = store_result
 
-    # ############################################################################
     # Create a new user
-    # ############################################################################
 
     payload = {
         "account_id": utils.v(account_result, "account_id"),

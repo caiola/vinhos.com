@@ -1,5 +1,4 @@
 """Restful resources"""
-
 import traceback
 
 from flask import Blueprint, jsonify
@@ -8,14 +7,13 @@ from flask_restful import Api
 from jwt.exceptions import ExpiredSignatureError, DecodeError
 from werkzeug.exceptions import HTTPException, UnsupportedMediaType
 
-from .resources import AdResource, AdsResource
+from .resources import CategoriesResource
 
-blueprint = Blueprint("ads", __name__)
+blueprint = Blueprint("categories", __name__)
 api = Api(blueprint)
 
-# Ads management
-api.add_resource(AdsResource, "/ads")
-api.add_resource(AdResource, "/ads/<uuid:pk>")
+# Categories management
+api.add_resource(CategoriesResource, "/categories", "/categories/<string:category>", endpoint="categoriesresource")
 
 """
 Global error handlers

@@ -1,8 +1,8 @@
 """Base resource with extended properties to parse payload"""
+import uuid
 
 from flask_restful import Resource
-from werkzeug.exceptions import BadRequest
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import BadRequest, HTTPException
 
 
 class BaseResource(Resource):
@@ -34,3 +34,15 @@ class BaseResource(Resource):
             errors = {"message": {"unknown": "unknown: " + str(e)}}
 
         return errors
+
+    def get_correlation_id(self, headers, args):
+        if headers is None:
+            return False
+
+        # This dependends on the hosting platform e.g. AWS, GCP, Azure have different header for the correlation id
+        correlation_id = headers.get('X-Correlation-ID')
+
+        if correlation_id is None:
+            correlation_id = uuid.uuid4()
+
+        return correlation_id
