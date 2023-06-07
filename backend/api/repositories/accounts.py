@@ -45,6 +45,48 @@ def update(account: Account, **kwargs) -> Account:
     return account.save()
 
 
+def registration(data: dict):
+    response = {}
+
+    # ############################################################################
+    # Create a new account
+    # ############################################################################
+    payload = {
+        "email": utils.v(data, "email")
+    }
+    account_result = accounts.create(payload)
+
+    response["account"] = account_result
+
+    # ############################################################################
+    # Create a new store
+    # ############################################################################
+
+    payload = {
+        "account_id": utils.v(account_result, "account_id"),
+        "store_name": "store-" + str(random.randint(100000, 10000000)),
+    }
+
+    store_result = stores.create(payload)
+
+    response["store"] = store_result
+
+    # ############################################################################
+    # Create a new user
+    # ############################################################################
+
+    payload = {
+        "account_id": utils.v(account_result, "account_id"),
+        "email": data["email"]
+    }
+
+    user_result = users.create(payload)
+
+    response["user"] = user_result
+
+    return response
+
+
 def create(data: dict) -> Account:
     """
     Create a new account, user and store
@@ -59,7 +101,8 @@ def create(data: dict) -> Account:
     try:
         result = schema.load(data_validation)
     except ValidationError as err:
-        abort(400, err.messages)
+        account_errors = [{"ref": ref, "message": msg} for ref, msgs in err.messages.items() for
+                          msg in msgs]
 
     payload = {
         "status_id": StatusType.NEW.value,
@@ -74,9 +117,9 @@ def create(data: dict) -> Account:
     account_result = account.save(refresh=True)
     account_id = account_result.id
 
-    ############################################################################
-    # Create a new store
-    ############################################################################
+    response = {}
+    response["account_id"] = account_id
+    response["account_errors"] = account_errors
 
     payload = {
         "account_id": account_id,

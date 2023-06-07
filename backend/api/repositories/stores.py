@@ -2,8 +2,6 @@
 
 from flask import abort
 from marshmallow import Schema, fields, ValidationError, EXCLUDE
-from pymysql.err import IntegrityError as PyMySQLIntegrityError
-from sqlalchemy.exc import IntegrityError
 
 from api.models import Store
 from api.models.status_type import StatusType
@@ -65,15 +63,8 @@ def create(data: dict) -> Store:
     store = Store(**payload)
 
     store_result = store.save(refresh=True)
-    #
-    # try:
-    #     # refresh to get details after save
-    #     store_result = store.save(refresh=True)
-    # except (IntegrityError, PyMySQLIntegrityError) as e:
-    #     store_result = None
-    #     abort(400, _("A store with the same criteria already exists."))
-    # except Exception as e:
-    #     store_result = None
-    #     abort(400, _("Unknown exception"))
 
-    return store_result
+    response = {}
+    response["store_id"] = store_result.id
+
+    return response
