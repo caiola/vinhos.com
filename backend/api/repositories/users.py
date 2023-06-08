@@ -1,9 +1,8 @@
 """ Defines the User repository """
 import secrets
 import uuid
-
 from flask import abort
-from marshmallow import Schema, fields, validate, ValidationError, EXCLUDE
+from marshmallow import EXCLUDE, Schema, ValidationError, fields, validate
 from pymysql.err import IntegrityError as PyMySQLIntegrityError
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
@@ -14,11 +13,15 @@ from api.models.tools import utils
 
 
 class UserCreateSchema(Schema):
-    email = fields.Str(required=True,
-                       validate=validate.Email(error="email-invalid"),
-                       error_messages={"required": "email-required",
-                                       "invalid": "email-invalid-type",
-                                       "type": "email-invalid-must-be-string"})
+    email = fields.Str(
+        required=True,
+        validate=validate.Email(error="email-invalid"),
+        error_messages={
+            "required": "email-required",
+            "invalid": "email-invalid-type",
+            "type": "email-invalid-must-be-string",
+        },
+    )
 
 
 def get_by(pk: int = None, uuid: uuid.UUID = None) -> User:
@@ -46,10 +49,7 @@ def update(user: User, **kwargs) -> User:
 def create(data: dict) -> User:
     """Create a new user"""
 
-    data_validation = {
-        "status_id": StatusType.NEW.value,
-        "email": data["email"]
-    }
+    data_validation = {"status_id": StatusType.NEW.value, "email": data["email"]}
 
     # Instantiate the schema
     schema = UserCreateSchema(unknown=EXCLUDE)
@@ -68,7 +68,7 @@ def create(data: dict) -> User:
         "middle_name": None,
         "last_name": None,
         # password is 16 bytes random -> 32 chars in hex
-        "password_hash": generate_password_hash(secrets.token_hex(16))
+        "password_hash": generate_password_hash(secrets.token_hex(16)),
     }
 
     user = User(**payload)
@@ -82,7 +82,11 @@ def create(data: dict) -> User:
     except (IntegrityError, PyMySQLIntegrityError) as e:
         user_result = None
         user_errors.append(
-            {"ref": "email", "message": "A user with this email already exists. Please use a different email."})
+            {
+                "ref": "email",
+                "message": "A user with this email already exists. Please use a different email.",
+            }
+        )
     except Exception as e:
         user_result = None
         user_errors.append({"ref": "email", "message": "Unknown exception"})

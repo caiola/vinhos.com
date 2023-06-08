@@ -1,7 +1,7 @@
 """
 Define the User model
 """
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from . import db
 from .abc import BaseModel, MetaBaseModel
@@ -13,11 +13,16 @@ class User(db.Model, BaseModel, metaclass=MetaBaseModel):
     """The User model"""
 
     __tablename__ = "user"
-    __table_args__ = {Database.ENGINE_KEY: Database.ENGINE_VALUE, Database.CHARSET_KEY: Database.CHARSET_VALUE,
-                      Database.COLLATION_KEY: Database.COLLATION_VALUE}
+    __table_args__ = {
+        Database.ENGINE_KEY: Database.ENGINE_VALUE,
+        Database.CHARSET_KEY: Database.CHARSET_VALUE,
+        Database.COLLATION_KEY: Database.COLLATION_VALUE,
+    }
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
-    status_id = db.Column(db.Integer(), default=StatusType.NEW.value, nullable=False, comment="Status id")
+    status_id = db.Column(
+        db.Integer(), default=StatusType.NEW.value, nullable=False, comment="Status id"
+    )
     account_id = db.Column(db.BigInteger(), nullable=False, comment="Account id")
 
     email = db.Column(db.String(50), nullable=False, unique=True, comment="Email")
