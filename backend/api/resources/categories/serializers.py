@@ -3,13 +3,13 @@ from flask_restful import fields
 CategorySerializer = {
     "id": fields.String,
     "main_category_id": fields.Integer,
-    "name": fields.String
+    "name": fields.String,
 }
 
 ListEntry = {
     "id": fields.String,
     "main_category_id": fields.String,
-    "name": fields.String
+    "name": fields.String,
 }
 
 ListSerializer = {

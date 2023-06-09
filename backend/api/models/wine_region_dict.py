@@ -3,7 +3,7 @@ Define the Wine Regions dict
 """
 
 
-class WineRegions():
+class WineRegions:
     def all():
         regions = [
             # Country: pt - Regions of Portugal

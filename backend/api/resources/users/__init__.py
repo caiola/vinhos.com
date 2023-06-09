@@ -1,13 +1,12 @@
 """Restful resources"""
 import traceback
 from flask import Blueprint, jsonify
-from flask_restful import Api
-from werkzeug.exceptions import HTTPException
-
 from flask_jwt_extended.exceptions import NoAuthorizationError
+from flask_restful import Api
+from jwt.exceptions import DecodeError, ExpiredSignatureError
+from werkzeug.exceptions import HTTPException, UnsupportedMediaType
+
 from .resources import UsersResource
-from jwt.exceptions import ExpiredSignatureError, DecodeError
-from werkzeug.exceptions import UnsupportedMediaType
 
 blueprint = Blueprint("users", __name__)
 api = Api(blueprint)
@@ -29,7 +28,7 @@ def internal_server_error(error):
         "status": 500,
         "error": "Internal Server Error",
         "message": str(error),
-        "traceback": traceback.format_exc()
+        "traceback": traceback.format_exc(),
     }
     return jsonify(response), 500
 
@@ -40,8 +39,10 @@ def handle_exception(e):
     Return internal server errors with JSON
     """
     if isinstance(e, UnsupportedMediaType):
-        custom_response = {"success": False,
-                           "errors": [{"ref": "payload", "key": "invalid_json", "message": str(e)}]}
+        custom_response = {
+            "success": False,
+            "errors": [{"ref": "payload", "key": "invalid_json", "message": str(e)}],
+        }
         return jsonify(**custom_response), 400
 
     if isinstance(e, HTTPException):
@@ -50,18 +51,28 @@ def handle_exception(e):
     # JWT errors management :: BEGIN
     # Token expired
     if isinstance(e, ExpiredSignatureError):
-        custom_response = {"success": False,
-                           "errors": [{"ref": "jwt", "key": "jwt_token_expired", "message": str(e)}]}
+        custom_response = {
+            "success": False,
+            "errors": [{"ref": "jwt", "key": "jwt_token_expired", "message": str(e)}],
+        }
         return jsonify(**custom_response), 401
     # Unable to decode JWT token
     if isinstance(e, DecodeError):
-        custom_response = {"success": False,
-                           "errors": [{"ref": "jwt", "key": "unable_to_decode_jwt_token", "message": str(e)}]}
+        custom_response = {
+            "success": False,
+            "errors": [
+                {"ref": "jwt", "key": "unable_to_decode_jwt_token", "message": str(e)}
+            ],
+        }
         return jsonify(**custom_response), 401
     # Without Bearer token
     if isinstance(e, NoAuthorizationError):
-        custom_response = {"success": False,
-                           "errors": [{"ref": "jwt", "key": "jwt_token_not_present", "message": str(e)}]}
+        custom_response = {
+            "success": False,
+            "errors": [
+                {"ref": "jwt", "key": "jwt_token_not_present", "message": str(e)}
+            ],
+        }
         return jsonify(**custom_response), 401
     # JWT errors management :: END
 
@@ -69,6 +80,6 @@ def handle_exception(e):
         "status": 500,
         "error": "Internal Server Error",
         "message": str(e),
-        "traceback": traceback.format_exc()
+        "traceback": traceback.format_exc(),
     }
     return jsonify(response), 500

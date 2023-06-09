@@ -11,8 +11,11 @@ class Status(db.Model, BaseModel, metaclass=MetaBaseModel):
     """The Status model"""
 
     __tablename__ = "status"
-    __table_args__ = {Database.ENGINE_KEY: Database.ENGINE_VALUE, Database.CHARSET_KEY: Database.CHARSET_VALUE,
-                      Database.COLLATION_KEY: Database.COLLATION_VALUE}
+    __table_args__ = {
+        Database.ENGINE_KEY: Database.ENGINE_VALUE,
+        Database.CHARSET_KEY: Database.CHARSET_VALUE,
+        Database.COLLATION_KEY: Database.COLLATION_VALUE,
+    }
 
     id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)

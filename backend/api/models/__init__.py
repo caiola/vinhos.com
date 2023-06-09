@@ -8,6 +8,6 @@ engine = sqlalchemy.create_engine(DB_URI)
 
 from .abc import BaseModel
 from .accounts import Account
+from .ads import Ad
 from .stores import Store
 from .users import User
-from .ads import Ad

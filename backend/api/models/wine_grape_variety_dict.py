@@ -3,8 +3,7 @@ Define the Wine Grape Variety dict
 """
 
 
-class WineGrapeVarieties():
-
+class WineGrapeVarieties:
     def all():
         varieties = [
             # Category: Vinho
@@ -186,7 +185,6 @@ class WineGrapeVarieties():
             {"id": 1176, "main_category_id": 1, "name": "Vital"},
             {"id": 1177, "main_category_id": 1, "name": "Viura"},
             {"id": 1178, "main_category_id": 1, "name": "Zéta"},
-
             # Category: Generosos
             {"id": 4001, "main_category_id": 4, "name": "Alicante Bouschet"},
             {"id": 4002, "main_category_id": 4, "name": "Alvarinho"},

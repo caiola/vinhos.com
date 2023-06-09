@@ -1,6 +1,6 @@
 """Categories Restful resources"""
 
-from flask import url_for, current_app, request
+from flask import current_app, request, url_for
 from flask_jwt_extended import jwt_required
 from flask_restful import marshal_with, reqparse
 
@@ -30,17 +30,27 @@ class CategoriesResource(BaseResource):
     def get(self, category=None):
         """Get all categories by category if defined"""
         args = list_resource_parser.parse_args()
-        pagination = categories.list(category=category).paginate(page=args["page"], per_page=args["size"])
+        pagination = categories.list(category=category).paginate(
+            page=args["page"], per_page=args["size"]
+        )
 
         return {
             "cid": self.get_correlation_id(request.headers, args),
             "total": pagination.total,
             "previous": url_for(
-                "categories.categoriesresource", page=args["page"] - 1, size=args["size"], category=category
+                "categories.categoriesresource",
+                page=args["page"] - 1,
+                size=args["size"],
+                category=category,
             )
             if pagination.has_prev
             else None,
-            "next": url_for("categories.categoriesresource", page=args["page"] + 1, size=args["size"], category=category)
+            "next": url_for(
+                "categories.categoriesresource",
+                page=args["page"] + 1,
+                size=args["size"],
+                category=category,
+            )
             if pagination.has_next
             else None,
             "results": pagination.items,
