@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required
 
 from api.models import Ad, User
 
+
 @jwt_required()
 def list():
     """Lists ads"""

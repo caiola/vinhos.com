@@ -1,11 +1,10 @@
 """Auth restful resources"""
 import os
-import time
 
-from flask import current_app, request, url_for, Flask
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
-from flask_restful import Api, Resource
-from flask_restful import reqparse
+import time
+from flask import Flask, current_app, request, url_for
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_restful import Api, Resource, reqparse
 
 from api.resources.base_resource import BaseResource
 
@@ -26,10 +25,18 @@ class AuthCredentialResource(BaseResource):
 
         # Add arguments
         resource_parser.add_argument(
-            "username", type=str, help="Username is required", required=True, location="json"
+            "username",
+            type=str,
+            help="Username is required",
+            required=True,
+            location="json",
         )
         resource_parser.add_argument(
-            "password", type=str, help="Password required", required=True, location="json"
+            "password",
+            type=str,
+            help="Password required",
+            required=True,
+            location="json",
         )
 
         errors = self.execute_parse_args(resource_parser)
@@ -54,18 +61,39 @@ class AuthCredentialResource(BaseResource):
 
         if self.v(errors, "account_name"):
             result.append(
-                {"ref": "username", "key": "username_is_required", "message": "Username is required"})
+                {
+                    "ref": "username",
+                    "key": "username_is_required",
+                    "message": "Username is required",
+                }
+            )
 
         if self.v(errors, "password"):
-            result.append({"ref": "password", "key": "password_is_required", "message": "Password is required"})
+            result.append(
+                {
+                    "ref": "password",
+                    "key": "password_is_required",
+                    "message": "Password is required",
+                }
+            )
 
         if self.v(errors, "payload"):
             result.append(
-                {"ref": "payload", "key": "payload_invalid", "message": "Payload is invalid"})
+                {
+                    "ref": "payload",
+                    "key": "payload_invalid",
+                    "message": "Payload is invalid",
+                }
+            )
 
         if self.v(errors, "unknown"):
             result.append(
-                {"ref": "unknown", "key": "unknown_exception", "message": self.v(errors, "unknown")})
+                {
+                    "ref": "unknown",
+                    "key": "unknown_exception",
+                    "message": self.v(errors, "unknown"),
+                }
+            )
 
         # @TODO Login with username and password
 

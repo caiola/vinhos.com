@@ -3,7 +3,7 @@ Define the database default values
 """
 
 
-class Database():
+class Database:
     ENGINE_KEY = "mysql_engine"
     ENGINE_VALUE = "InnoDB"
     CHARSET_KEY = "mysql_charset"

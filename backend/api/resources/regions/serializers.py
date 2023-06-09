@@ -3,14 +3,10 @@ from flask_restful import fields
 RegionSerializer = {
     "id": fields.String,
     "country": fields.String,
-    "name": fields.String
+    "name": fields.String,
 }
 
-ListEntry = {
-    "id": fields.String,
-    "country": fields.String,
-    "name": fields.String
-}
+ListEntry = {"id": fields.String, "country": fields.String, "name": fields.String}
 
 ListSerializer = {
     "cid": fields.String,

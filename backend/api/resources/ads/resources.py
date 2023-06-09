@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required
 from flask_restful import Resource, abort, marshal_with, reqparse
 
 from api.repositories import ads
+
 from .serializers import AdSerializer, ListSerializer
 
 ads_resource_parser = reqparse.RequestParser()

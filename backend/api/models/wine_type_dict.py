@@ -3,7 +3,7 @@ Define the Status Type dict
 """
 
 
-class WineTypes():
+class WineTypes:
     def all():
         wine_types = [
             # Category: Vinho
@@ -15,7 +15,6 @@ class WineTypes():
             {"id": 106, "main_category_id": 1, "name": "Rosé"},
             {"id": 107, "main_category_id": 1, "name": "Tinto"},
             {"id": 108, "main_category_id": 1, "name": "Sake"},
-
             # Category: Porto
             {"id": 201, "main_category_id": 2, "name": "Raridades"},
             {"id": 202, "main_category_id": 2, "name": "Porto Garrafeira"},

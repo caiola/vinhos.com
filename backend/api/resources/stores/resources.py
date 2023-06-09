@@ -17,7 +17,11 @@ class StoresResource(BaseResource):
 
         # Add arguments
         resource_parser.add_argument(
-            "store_name", type=str, help="Store name is required", required=True, location="json"
+            "store_name",
+            type=str,
+            help="Store name is required",
+            required=True,
+            location="json",
         )
 
         errors = self.execute_parse_args(resource_parser)
@@ -37,15 +41,30 @@ class StoresResource(BaseResource):
 
         if self.v(errors, "store_name"):
             result.append(
-                {"ref": "store_name", "key": "store_name_is_required", "message": "Store name is required"})
+                {
+                    "ref": "store_name",
+                    "key": "store_name_is_required",
+                    "message": "Store name is required",
+                }
+            )
 
         if self.v(errors, "payload"):
             result.append(
-                {"ref": "payload", "key": "payload_invalid", "message": "Payload is invalid"})
+                {
+                    "ref": "payload",
+                    "key": "payload_invalid",
+                    "message": "Payload is invalid",
+                }
+            )
 
         if self.v(errors, "unknown"):
             result.append(
-                {"ref": "unknown", "key": "unknown_exception", "message": self.v(errors, "unknown")})
+                {
+                    "ref": "unknown",
+                    "key": "unknown_exception",
+                    "message": self.v(errors, "unknown"),
+                }
+            )
 
         custom_response = {"success": False, "errors": result}
         return custom_response

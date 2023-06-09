@@ -1,7 +1,7 @@
 """ Defines the Store repository """
 
 from flask import abort
-from marshmallow import Schema, fields, ValidationError, EXCLUDE
+from marshmallow import EXCLUDE, Schema, ValidationError, fields
 
 from api.models import Store
 from api.models.status_type import StatusType
@@ -42,7 +42,7 @@ def create(data: dict) -> Store:
     data_validation = {
         "status_id": StatusType.NEW.value,
         "account_id": data["account_id"],
-        "store_name": data["store_name"]
+        "store_name": data["store_name"],
     }
 
     # Instantiate the schema
@@ -57,7 +57,7 @@ def create(data: dict) -> Store:
     payload = {
         "status_id": StatusType.NEW.value,
         "account_id": data["account_id"],
-        "store_name": data["store_name"]
+        "store_name": data["store_name"],
     }
 
     store = Store(**payload)

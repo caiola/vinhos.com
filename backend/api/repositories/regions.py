@@ -15,6 +15,12 @@ def list(country=None):
         # Get the first two chars from string
         params["country"] = str(country)[:2]
 
-    current_app.logger.debug({"ENDPOINT-CALL": "regions.list().params", "params:": params, "country": country})
+    current_app.logger.debug(
+        {
+            "ENDPOINT-CALL": "regions.list().params",
+            "params:": params,
+            "country": country,
+        }
+    )
 
     return WineRegion.query.filter_by(**params).order_by(WineRegion.id.asc())

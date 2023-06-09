@@ -19,13 +19,25 @@ class UsersResource(BaseResource):
 
         # Add arguments
         resource_parser.add_argument(
-            "first_name", type=str, help="First name is required", required=True, location="json"
+            "first_name",
+            type=str,
+            help="First name is required",
+            required=True,
+            location="json",
         )
         resource_parser.add_argument(
-            "middle_name", type=str, help="Middle name is required", required=True, location="json"
+            "middle_name",
+            type=str,
+            help="Middle name is required",
+            required=True,
+            location="json",
         )
         resource_parser.add_argument(
-            "last_name", type=str, help="Last name is required", required=True, location="json"
+            "last_name",
+            type=str,
+            help="Last name is required",
+            required=True,
+            location="json",
         )
 
         errors = self.execute_parse_args(resource_parser)
@@ -50,18 +62,39 @@ class UsersResource(BaseResource):
 
         if self.v(errors, "first_name"):
             result.append(
-                {"ref": "first_name", "key": "first_name_is_required", "message": "First name is required"})
+                {
+                    "ref": "first_name",
+                    "key": "first_name_is_required",
+                    "message": "First name is required",
+                }
+            )
 
         if self.v(errors, "last_name"):
-            result.append({"ref": "last_name", "key": "last_is_required", "message": "Last name is required"})
+            result.append(
+                {
+                    "ref": "last_name",
+                    "key": "last_is_required",
+                    "message": "Last name is required",
+                }
+            )
 
         if self.v(errors, "payload"):
             result.append(
-                {"ref": "payload", "key": "payload_invalid", "message": "Payload is invalid"})
+                {
+                    "ref": "payload",
+                    "key": "payload_invalid",
+                    "message": "Payload is invalid",
+                }
+            )
 
         if self.v(errors, "unknown"):
             result.append(
-                {"ref": "unknown", "key": "unknown_exception", "message": self.v(errors, "unknown")})
+                {
+                    "ref": "unknown",
+                    "key": "unknown_exception",
+                    "message": self.v(errors, "unknown"),
+                }
+            )
 
         custom_response = {"success": False, "errors": result}
         return custom_response
