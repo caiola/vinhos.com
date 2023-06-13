@@ -1,16 +1,20 @@
 """ Defines the Account repository """
+import json
+
 import pycountry
 import random
-from flask import abort
-from marshmallow import Schema, ValidationError, fields, validate
+from flask import abort, current_app
+from marshmallow import Schema, ValidationError, fields, validate, EXCLUDE, RAISE, INCLUDE
 
 from api.models import Account
 from api.models.status_type import StatusType
-from api.repositories import stores, users
+from api.models.tools import utils
+from api.repositories import stores, users, accounts
 
 
 class AccountCreateSchema(Schema):
-    # account_name = fields.Str(required=True, error="Invalid account name")
+    country = fields.Str(required=True, error="Invalid account name")
+    account_name = fields.Str(required=True, error="Invalid account name")
     email = fields.Str(
         required=True,
         validate=validate.Email(error="email-invalid"),
@@ -20,23 +24,24 @@ class AccountCreateSchema(Schema):
             "type": "email-invalid-must-be-string",
         },
     )
-    country = fields.Str(
-        required=True,
-        validate=validate.OneOf(
-            [item.alpha_2 for item in pycountry.countries], error="invalid-country"
-        ),
-    )
+
+    # @TODO Country validation not working when looking up with 2 letters country name
+    # country = fields.Str(
+    #     required=True,
+    #     validate=validate.OneOf(
+    #         [item.alpha_2.lower() for item in pycountry.countries], error="invalid-country"
+    #     ),
+    # )
 
 
 def get_by(pk: int = None, name: str = None) -> Account:
     """Query a account by uuid or id"""
-
     params = {}
     if (not pk and not name) or (pk and name):
         raise ValueError("Provide pk or name")
 
     if name:
-        params["name"] = str(name)
+        params["account_name"] = str(name)
 
     if pk:
         params["pk"] = pk
@@ -54,10 +59,16 @@ def registration(data: dict):
     response = {}
 
     # Create a new account
-    payload = {"email": utils.v(data, "email")}
+    payload = {
+        "country": utils.v(data, "country"),
+        "account_name": utils.v(data, "account_name"),
+        "email": utils.v(data, "email")
+    }
     account_result = accounts.create(payload)
 
     response["account"] = account_result
+
+    return account_result
 
     # Create a new store
 
@@ -86,17 +97,17 @@ def registration(data: dict):
 
 def create(data: dict) -> Account:
     """
-    Create a new account, user and store
+    Create a new account
     """
-
-    data_validation = {"email": data["email"]}
 
     # Instantiate the schema
     schema = AccountCreateSchema()
 
     # Validate an email
+    result = None
     try:
-        result = schema.load(data_validation)
+        result = schema.load(data=data, partial=False, unknown=RAISE)
+        account_errors = []
     except ValidationError as err:
         account_errors = [
             {"ref": ref, "message": msg}
@@ -104,39 +115,67 @@ def create(data: dict) -> Account:
             for msg in msgs
         ]
 
-    payload = {
-        "status_id": StatusType.NEW.value,
-        "address_id": None,
-        "account_name": "account-" + str(random.randint(100000, 10000000)),
-        # User can change country later
-        "country": Countries.PT.name,
-    }
+    # Debug errors
+    # return account_errors
 
-    account = Account(**payload)
+    country = pycountry.countries.get(alpha_2=data.get("country").upper())
+    if country is None:
+        country2 = "pt"
+    else:
+        country2 = country.alpha_2.lower() if hasattr(country, 'alpha_2') else "pt"
 
-    account_result = account.save(refresh=True)
-    account_id = account_result.id
+    account_name = data.get("account_name").lower()
+
+    try:
+        accounts.get_by(name=account_name)
+        found = True
+        account_errors += [
+            {"ref": "account", "message": "Account name already exists"}
+        ]
+    except:
+        found = False
+
+    # DEBUG :: Log country
+    current_app.logger.debug({country: country2})
 
     response = {}
-    response["account_id"] = account_id
-    response["account_errors"] = account_errors
 
-    payload = {
-        "account_id": account_id,
-        "store_name": "store-" + str(random.randint(100000, 10000000)),
-    }
+    if not found:
+        payload = {
+            "status_id": StatusType.NEW.value,
+            "address_id": None,
+            "account_name": data.get("account_name"),
+            "country": country2
+        }
 
-    store_result = stores.create(payload)
+        account = Account(**payload)
 
-    ############################################################################
-    # Create a new user
-    ############################################################################
-    payload = {
-        # "status_id": StatusType.NEW.value,
-        "account_id": account_id,
-        "email": data["email"],
-    }
+        account_result = account.save(refresh=True)
+        account_id = account_result.id
 
-    user_result = users.create(payload)
+        response["account_id"] = account_id
 
-    return user_result
+    if account_errors:
+        response["errors"] = account_errors
+
+    return response
+
+    # payload = {
+    #     "account_id": account_id,
+    #     "store_name": "store-" + str(random.randint(100000, 10000000)),
+    # }
+    #
+    # store_result = stores.create(payload)
+    #
+    # ############################################################################
+    # # Create a new user
+    # ############################################################################
+    # payload = {
+    #     # "status_id": StatusType.NEW.value,
+    #     "account_id": account_id,
+    #     "email": data["email"],
+    # }
+    #
+    # user_result = users.create(payload)
+    #
+    # return user_result

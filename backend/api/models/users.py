@@ -19,7 +19,7 @@ class User(db.Model, BaseModel, metaclass=MetaBaseModel):
         Database.COLLATION_KEY: Database.COLLATION_VALUE,
     }
 
-    id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
+    id = db.Column(db.BigInteger(), primary_key=True, nullable=False, comment="Primary key")
     status_id = db.Column(
         db.Integer(), default=StatusType.NEW.value, nullable=False, comment="Status id"
     )

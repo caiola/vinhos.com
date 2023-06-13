@@ -93,6 +93,6 @@ def create(data: dict) -> User:
 
     response = {}
     response["user_id"] = utils.v(user_result, "user_id")
-    response["account_errors"] = user_errors
+    response["errors"] = user_errors
 
     return response
