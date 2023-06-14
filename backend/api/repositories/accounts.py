@@ -1,15 +1,15 @@
 """ Defines the Account repository """
-import json
+from typing import Any
 
 import pycountry
-import random
-from flask import abort, current_app
-from marshmallow import Schema, ValidationError, fields, validate, EXCLUDE, RAISE, INCLUDE
+from flask import current_app
+from marshmallow import Schema, fields, validate
+from sqlalchemy.exc import NoResultFound
 
 from api.models import Account
 from api.models.status_type import StatusType
 from api.models.tools import utils
-from api.repositories import stores, users, accounts
+from api.repositories import users, accounts
 
 
 class AccountCreateSchema(Schema):
@@ -58,41 +58,86 @@ def update(account: Account, **kwargs) -> Account:
 def registration(data: dict):
     response = {}
 
+    current_app.logger.debug({
+        "FUNCTION-CALL": "accounts.registration()",
+        "data": data
+    })
+
+    # Check prerequisites: account name and email must be unique
+    errors = []
+
+    accounts.exists(data, errors)
+    current_app.logger.debug({
+        "FUNCTION-CALL": "accounts.registration().account-exists",
+        "errors": errors
+    })
+
+    users.exists(data, errors)
+    current_app.logger.debug({
+        "FUNCTION-CALL": "accounts.registration().user-exists",
+        "errors": errors
+    })
+
+    # If errors are found return to client
+    if bool(errors):
+        return {"errors": errors}
+
     # Create a new account
-    payload = {
-        "country": utils.v(data, "country"),
-        "account_name": utils.v(data, "account_name"),
-        "email": utils.v(data, "email")
-    }
-    account_result = accounts.create(payload)
+    # payload = {
+    #     "country": utils().get_value(data=data, key="country"),
+    #     "account_name": utils().get_value(data=data, key="account_name"),
+    #     # "email": utils().get_value(data=data, key="email")
+    # }
+    # account_result = accounts.create(payload)
+    #
+    # response["account"] = account_result
 
-    response["account"] = account_result
-
-    return account_result
-
-    # Create a new store
-
-    payload = {
-        "account_id": utils.v(account_result, "account_id"),
-        "store_name": "store-" + str(random.randint(100000, 10000000)),
-    }
-
-    store_result = stores.create(payload)
-
-    response["store"] = store_result
+    # account_result = {}
+    # account_result["account_id"] = 131
 
     # Create a new user
-
     payload = {
-        "account_id": utils.v(account_result, "account_id"),
-        "email": data["email"],
+        "account_id": utils().get_value(data=account_result, key="account_id"),
+        "email": utils().get_value(data=data, key="email")
     }
+
+    current_app.logger.debug({
+        "FUNCTION-CALL": "accounts.registration().user-payload",
+        "payload": payload
+    })
 
     user_result = users.create(payload)
 
     response["user"] = user_result
 
+    # Create a new store
+
+    # payload = {
+    #     "account_id": utils().get_value(data=account_result, key="account_id"),
+    #     "store_name": "store-" + str(random.randint(100000, 10000000)),
+    # }
+    #
+    # store_result = stores.create(payload)
+    #
+    # response["store"] = store_result
+    #
+
     return response
+
+
+def exists(data, errors) -> Any:
+    account_name = utils().get_value(data, "account_name", "").lower()
+
+    found = False
+    try:
+        account = accounts.get_by(name=account_name)
+        if account is not None:
+            utils().add_error(errors, "account", "Account name already exists")
+        found = True
+    except NoResultFound:
+        pass
+
+    return found
 
 
 def create(data: dict) -> Account:
@@ -103,21 +148,6 @@ def create(data: dict) -> Account:
     # Instantiate the schema
     schema = AccountCreateSchema()
 
-    # Validate an email
-    result = None
-    try:
-        result = schema.load(data=data, partial=False, unknown=RAISE)
-        account_errors = []
-    except ValidationError as err:
-        account_errors = [
-            {"ref": ref, "message": msg}
-            for ref, msgs in err.messages.items()
-            for msg in msgs
-        ]
-
-    # Debug errors
-    # return account_errors
-
     country = pycountry.countries.get(alpha_2=data.get("country").upper())
     if country is None:
         country2 = "pt"
@@ -126,17 +156,23 @@ def create(data: dict) -> Account:
 
     account_name = data.get("account_name").lower()
 
+    account_errors = []
     try:
         accounts.get_by(name=account_name)
         found = True
-        account_errors += [
-            {"ref": "account", "message": "Account name already exists"}
-        ]
-    except:
+        utils().add_error(account_errors, "account", "Account name already exists")
+    except NoResultFound as err:
         found = False
 
     # DEBUG :: Log country
-    current_app.logger.debug({country: country2})
+    current_app.logger.debug({
+        "FUNCTION-CALL": "accounts.create()",
+        "country": country,
+        "country2": country2,
+        "errors_account_registration": account_errors,
+        "name": account_name,
+        "found": found
+    })
 
     response = {}
 
