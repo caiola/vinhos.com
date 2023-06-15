@@ -1,5 +1,5 @@
 """
-Define the User model
+Define the Account model
 """
 from . import db
 from .abc import BaseModel, MetaBaseModel

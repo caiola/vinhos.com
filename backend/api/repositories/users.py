@@ -80,15 +80,16 @@ def exists(data, errors) -> Any:
     return found
 
 
-def create(data: dict) -> User:
-    """Create a new user"""
-
-    # data_validation = {"status_id": StatusType.NEW.value, "email": data["email"]}
+def create(data: dict) -> Union[User, None]:
+    """
+    Create a new user
+    """
+    response = {}
 
     # Instantiate the schema
     schema = UserCreateSchema(unknown=EXCLUDE)
 
-    # Validate user data
+    # Validate data
     result = None
     try:
         result = schema.load(data=data, partial=False, unknown=RAISE)
@@ -100,47 +101,43 @@ def create(data: dict) -> User:
             for msg in msgs
         ]
 
-    return {"errors": user_errors}
+    account_id = utils().get_value(data, "account_id")
 
-    # Validate an user data
-    # try:
-    #     result = schema.load(data_validation)
-    # except ValidationError as err:
-    #     abort(400, err.messages)
-
-    payload = {
-        "status_id": StatusType.NEW.value,
-        "account_id": utils().get_value(data, "account_id"),
-        "email": utils().get_value(data, "email"),
-        "first_name": None,
-        "middle_name": None,
-        "last_name": None,
-        # password is 16 bytes random -> 32 chars in hex
-        "password_hash": generate_password_hash(secrets.token_hex(16)),
-    }
-
-    user = User(**payload)
-
-    user_errors = []
-
-    # Catch all exceptions because we dont want to log password_hash that is generated
-    try:
-        # refresh to get details after save
-        user_result = user.save(refresh=True)
-    except (IntegrityError, PyMySQLIntegrityError) as e:
-        user_result = None
+    if not account_id:
         user_errors.append(
-            {
-                "ref": "email",
-                "message": "A user with this email already exists. Please use a different email.",
-            }
-        )
-    except Exception as e:
-        user_result = None
-        user_errors.append({"ref": "email", "message": "Unknown exception"})
+            {"ref": "user.account_id", "message": "Account id is undefined. Cannot proceed with user creation"})
+    else:
+        payload = {
+            "status_id": StatusType.NEW.value,
+            "account_id": account_id,
+            "email": utils().get_value(data, "email"),
+            # password is 16 bytes random -> 32 chars in hex
+            "password_hash": generate_password_hash(secrets.token_hex(16)),
+        }
 
-    response = {}
-    response["user_id"] = utils().get_value(data=user_result, key="user_id")
-    response["errors"] = user_errors
+        user = User(**payload)
+
+        # Catch all exceptions because we dont want to log password_hash that is generated
+        try:
+            # refresh to get details after save
+            user = user.save(refresh=True)
+        except (IntegrityError, PyMySQLIntegrityError) as err:
+            user = None
+            user_errors.append(
+                {
+                    "ref": "email",
+                    # "message": "A user with this email already exists. Please use a different email.",
+                    "message": str(err)
+                }
+            )
+        except Exception as e:
+            user = None
+            user_errors.append({"ref": "email", "message": "Unknown exception"})
+
+        if user:
+            response["user_id"] = user.id
+
+    if user_errors:
+        response["errors"] = user_errors
 
     return response

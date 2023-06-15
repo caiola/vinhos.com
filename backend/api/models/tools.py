@@ -10,6 +10,8 @@ class utils:
             return default
         try:
             return data[key]
+        except AttributeError:
+            return default
         except KeyError:
             return default
         except TypeError:
@@ -19,7 +21,7 @@ class utils:
                 "key": key,
                 "default": default
             })
-            return data.get(key)
+            return default
 
     def error(self, key, message) -> Any:
         return {"ref": key, "message": message}

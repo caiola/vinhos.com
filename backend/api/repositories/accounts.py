@@ -1,5 +1,5 @@
 """ Defines the Account repository """
-from typing import Any
+from typing import Any, Union
 
 import pycountry
 from flask import current_app
@@ -9,7 +9,7 @@ from sqlalchemy.exc import NoResultFound
 from api.models import Account
 from api.models.status_type import StatusType
 from api.models.tools import utils
-from api.repositories import users, accounts
+from api.repositories import users, accounts, stores
 
 
 class AccountCreateSchema(Schema):
@@ -67,33 +67,23 @@ def registration(data: dict):
     errors = []
 
     accounts.exists(data, errors)
-    current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.registration().account-exists",
-        "errors": errors
-    })
-
     users.exists(data, errors)
+
     current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.registration().user-exists",
+        "FUNCTION-CALL": "accounts.registration().exists",
         "errors": errors
     })
 
     # If errors are found return to client
-    if bool(errors):
-        return {"errors": errors}
+    # if bool(errors):
+    #     return {"errors": errors}
 
     # Create a new account
-    # payload = {
-    #     "country": utils().get_value(data=data, key="country"),
-    #     "account_name": utils().get_value(data=data, key="account_name"),
-    #     # "email": utils().get_value(data=data, key="email")
-    # }
-    # account_result = accounts.create(payload)
-    #
-    # response["account"] = account_result
-
-    # account_result = {}
-    # account_result["account_id"] = 131
+    payload = {
+        "country": utils().get_value(data=data, key="country"),
+        "account_name": utils().get_value(data=data, key="account_name")
+    }
+    account_result = accounts.create(payload)
 
     # Create a new user
     payload = {
@@ -108,19 +98,23 @@ def registration(data: dict):
 
     user_result = users.create(payload)
 
-    response["user"] = user_result
-
     # Create a new store
+    payload = {
+        "account_id": utils().get_value(data=account_result, key="account_id"),
+        "store_name": utils().get_value(data=data, key="account_name")
+    }
 
-    # payload = {
-    #     "account_id": utils().get_value(data=account_result, key="account_id"),
-    #     "store_name": "store-" + str(random.randint(100000, 10000000)),
-    # }
-    #
-    # store_result = stores.create(payload)
-    #
-    # response["store"] = store_result
-    #
+    current_app.logger.debug({
+        "FUNCTION-CALL": "accounts.registration().store-payload",
+        "payload": payload
+    })
+
+    store_result = stores.create(payload)
+
+    response = {**account_result, **user_result, **store_result}
+
+    if errors:
+        response = {**response, **{"errors": errors}}
 
     return response
 
@@ -140,7 +134,7 @@ def exists(data, errors) -> Any:
     return found
 
 
-def create(data: dict) -> Account:
+def create(data: dict) -> Union[Account, dict, list, None]:
     """
     Create a new account
     """
@@ -157,6 +151,8 @@ def create(data: dict) -> Account:
     account_name = data.get("account_name").lower()
 
     account_errors = []
+
+    # @TODO Refactor to use method .exists()
     try:
         accounts.get_by(name=account_name)
         found = True
@@ -195,23 +191,3 @@ def create(data: dict) -> Account:
         response["errors"] = account_errors
 
     return response
-
-    # payload = {
-    #     "account_id": account_id,
-    #     "store_name": "store-" + str(random.randint(100000, 10000000)),
-    # }
-    #
-    # store_result = stores.create(payload)
-    #
-    # ############################################################################
-    # # Create a new user
-    # ############################################################################
-    # payload = {
-    #     # "status_id": StatusType.NEW.value,
-    #     "account_id": account_id,
-    #     "email": data["email"],
-    # }
-    #
-    # user_result = users.create(payload)
-    #
-    # return user_result
