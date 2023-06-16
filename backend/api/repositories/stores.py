@@ -1,13 +1,12 @@
 """ Defines the Store repository """
-from typing import Union, Any
-
-from marshmallow import EXCLUDE, Schema, ValidationError, fields, RAISE
+from marshmallow import EXCLUDE, RAISE, Schema, ValidationError, fields
 from pymysql.err import IntegrityError as PyMySQLIntegrityError
 from sqlalchemy.exc import IntegrityError, NoResultFound
+from typing import Any, Union
 
 from api.models import Store
 from api.models.status_type import StatusType
-from api.models.utils import get_value, add_error
+from api.models.utils import add_error, get_value
 from api.repositories import stores
 
 

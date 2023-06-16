@@ -1,17 +1,16 @@
 """ Defines the User repository """
 import secrets
 import uuid
-from typing import Any, Union
-
 from flask import current_app
-from marshmallow import EXCLUDE, Schema, ValidationError, fields, validate, RAISE
+from marshmallow import EXCLUDE, RAISE, Schema, ValidationError, fields, validate
 from pymysql.err import IntegrityError as PyMySQLIntegrityError
 from sqlalchemy.exc import IntegrityError, NoResultFound
+from typing import Any, Union
 from werkzeug.security import generate_password_hash
 
 from api.models import User
 from api.models.status_type import StatusType
-from api.models.utils import get_value, add_error
+from api.models.utils import add_error, get_value
 from api.repositories import users
 
 

@@ -1,15 +1,14 @@
 """ Defines the Account repository """
-from typing import Any, Union
-
 import pycountry
 from flask import current_app
 from marshmallow import Schema, fields, validate
 from sqlalchemy.exc import NoResultFound
+from typing import Any, Union
 
 from api.models import Account
 from api.models.status_type import StatusType
-from api.models.utils import get_value, add_error
-from api.repositories import users, accounts, stores
+from api.models.utils import add_error, get_value
+from api.repositories import accounts, stores, users
 
 
 class AccountCreateSchema(Schema):
