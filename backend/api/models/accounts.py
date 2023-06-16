@@ -1,5 +1,5 @@
 """
-Define the User model
+Define the Account model
 """
 from . import db
 from .abc import BaseModel, MetaBaseModel
@@ -17,7 +17,9 @@ class Account(db.Model, BaseModel, metaclass=MetaBaseModel):
         Database.COLLATION_KEY: Database.COLLATION_VALUE,
     }
 
-    id = db.Column(db.BigInteger(), primary_key=True, nullable=False)
+    id = db.Column(
+        db.BigInteger(), primary_key=True, nullable=False, comment="Primary key"
+    )
     status_id = db.Column(
         db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id"
     )
@@ -25,8 +27,9 @@ class Account(db.Model, BaseModel, metaclass=MetaBaseModel):
 
     account_name = db.Column(
         db.String(60),
-        nullable=True,
-        comment="Account can have any name, it is an internal reference",
+        nullable=False,
+        unique=True,
+        comment="Account name is unique",
     )
 
     # Tax information

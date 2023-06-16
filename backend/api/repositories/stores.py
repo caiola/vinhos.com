@@ -1,10 +1,13 @@
 """ Defines the Store repository """
-
-from flask import abort
-from marshmallow import EXCLUDE, Schema, ValidationError, fields
+from marshmallow import EXCLUDE, RAISE, Schema, ValidationError, fields
+from pymysql.err import IntegrityError as PyMySQLIntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
+from typing import Any, Union
 
 from api.models import Store
 from api.models.status_type import StatusType
+from api.models.utils import add_error, get_value
+from api.repositories import stores
 
 
 class StoreCreateSchema(Schema):
@@ -34,13 +37,28 @@ def update(store: Store, **kwargs) -> Store:
     return store.save()
 
 
-def create(data: dict) -> Store:
+def exists(data, errors) -> Any:
+    account_id = get_value(data, "account_id", 0)
+
+    found = False
+    try:
+        store = stores.get_by(id=account_id)
+        if store is not None:
+            add_error(errors, "account", "Store already exists")
+        found = True
+    except NoResultFound:
+        pass
+
+    return found
+
+
+def create(data: dict) -> Union[Store, None]:
     """
     Create a new store
     """
+    response = {}
 
     data_validation = {
-        "status_id": StatusType.NEW.value,
         "account_id": data["account_id"],
         "store_name": data["store_name"],
     }
@@ -49,22 +67,56 @@ def create(data: dict) -> Store:
     schema = StoreCreateSchema(unknown=EXCLUDE)
 
     # Validate data
+    result = None
     try:
-        result = schema.load(data_validation)
+        result = schema.load(data=data_validation, partial=False, unknown=RAISE)
+        store_errors = []
     except ValidationError as err:
-        abort(400, err.messages)
+        store_errors = [
+            {"ref": ref, "message": msg}
+            for ref, msgs in err.messages.items()
+            for msg in msgs
+        ]
 
-    payload = {
-        "status_id": StatusType.NEW.value,
-        "account_id": data["account_id"],
-        "store_name": data["store_name"],
-    }
+    account_id = get_value(data, "account_id")
 
-    store = Store(**payload)
+    if not account_id:
+        store_errors.append(
+            {
+                "ref": "store.account_id",
+                "message": "Account id is undefined. Cannot proceed with user creation",
+            }
+        )
+    else:
+        payload = {
+            "status_id": StatusType.NEW.value,
+            "account_id": data["account_id"],
+            "store_name": data["store_name"],
+        }
 
-    store_result = store.save(refresh=True)
+        store = Store(**payload)
 
-    response = {}
-    response["store_id"] = store_result.id
+        # Catch all exceptions because we dont want to log password_hash that is generated
+        try:
+            # refresh to get details after save
+            store = store.save(refresh=True)
+        except (IntegrityError, PyMySQLIntegrityError) as err:
+            store = None
+            store_errors.append(
+                {
+                    "ref": "email",
+                    # "message": "A user with this email already exists. Please use a different email.",
+                    "message": str(err),
+                }
+            )
+        except Exception as e:
+            store = None
+            store_errors.append({"ref": "email", "message": "Unknown exception"})
+
+        if store:
+            response["store_id"] = store.id
+
+    if store_errors:
+        response["errors"] = store_errors
 
     return response

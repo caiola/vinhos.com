@@ -276,5 +276,17 @@ docker run -it --rm -v %cd%:/app -w /app img-local-poetry /bin/bash -c "poetry l
 
 
 ```
+## Black
 
+Run code formatter
+```
+# Verify changes
+poetry run black . --check
+poetry run isort . --profile black --check
+
+# Apply changes
+poetry run black .
+poetry run isort . --profile black
+
+```
 
