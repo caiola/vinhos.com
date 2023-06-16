@@ -274,7 +274,9 @@ cd backend
 docker build -t img-local-poetry -f backend/dockerfile-apiserver-local ./backend
 docker run -it --rm -v %cd%:/app -w /app img-local-poetry /bin/bash -c "poetry lock"
 
-
+# Run tests with poetry
+poetry add --group dev factory-boy
+poetry  --extras dev run pytest
 ```
 ## Black
 
