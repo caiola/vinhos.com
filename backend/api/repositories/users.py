@@ -28,7 +28,9 @@ class UserCreateSchema(Schema):
     )
 
 
-def get_by(pk: int = None, uuid: uuid.UUID = None, email: str = None) -> Union[User, None]:
+def get_by(
+    pk: int = None, uuid: uuid.UUID = None, email: str = None
+) -> Union[User, None]:
     """Query a user by uuid or id"""
 
     params = {}
@@ -44,11 +46,9 @@ def get_by(pk: int = None, uuid: uuid.UUID = None, email: str = None) -> Union[U
     if email:
         params["email"] = email
 
-    current_app.logger.debug({
-        "FUNCTION-CALL": "users.get_by()",
-        "params": params,
-        "email": email
-    })
+    current_app.logger.debug(
+        {"FUNCTION-CALL": "users.get_by()", "params": params, "email": email}
+    )
 
     if bool(params):
         return User.query.filter_by(**params).one()
@@ -105,7 +105,11 @@ def create(data: dict) -> Union[User, None]:
 
     if not account_id:
         user_errors.append(
-            {"ref": "user.account_id", "message": "Account id is undefined. Cannot proceed with user creation"})
+            {
+                "ref": "user.account_id",
+                "message": "Account id is undefined. Cannot proceed with user creation",
+            }
+        )
     else:
         payload = {
             "status_id": StatusType.NEW.value,
@@ -127,7 +131,7 @@ def create(data: dict) -> Union[User, None]:
                 {
                     "ref": "email",
                     # "message": "A user with this email already exists. Please use a different email.",
-                    "message": str(err)
+                    "message": str(err),
                 }
             )
         except Exception as e:

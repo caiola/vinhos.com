@@ -16,6 +16,4 @@ def get_value(data, key, default=None) -> Any:
 
 
 def add_error(errors, key, message) -> Any:
-    errors += [
-        {"ref": key, "message": message}
-    ]
+    errors += [{"ref": key, "message": message}]

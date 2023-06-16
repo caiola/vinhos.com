@@ -61,7 +61,7 @@ def create(data: dict) -> Union[Store, None]:
 
     data_validation = {
         "account_id": data["account_id"],
-        "store_name": data["store_name"]
+        "store_name": data["store_name"],
     }
 
     # Instantiate the schema
@@ -83,12 +83,16 @@ def create(data: dict) -> Union[Store, None]:
 
     if not account_id:
         store_errors.append(
-            {"ref": "store.account_id", "message": "Account id is undefined. Cannot proceed with user creation"})
+            {
+                "ref": "store.account_id",
+                "message": "Account id is undefined. Cannot proceed with user creation",
+            }
+        )
     else:
         payload = {
             "status_id": StatusType.NEW.value,
             "account_id": data["account_id"],
-            "store_name": data["store_name"]
+            "store_name": data["store_name"],
         }
 
         store = Store(**payload)
@@ -103,7 +107,7 @@ def create(data: dict) -> Union[Store, None]:
                 {
                     "ref": "email",
                     # "message": "A user with this email already exists. Please use a different email.",
-                    "message": str(err)
+                    "message": str(err),
                 }
             )
         except Exception as e:

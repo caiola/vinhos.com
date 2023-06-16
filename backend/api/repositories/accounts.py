@@ -58,10 +58,7 @@ def update(account: Account, **kwargs) -> Account:
 def registration(data: dict):
     response = {}
 
-    current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.registration()",
-        "data": data
-    })
+    current_app.logger.debug({"FUNCTION-CALL": "accounts.registration()", "data": data})
 
     # Check prerequisites: account name and email must be unique
     errors = []
@@ -69,10 +66,9 @@ def registration(data: dict):
     accounts.exists(data, errors)
     users.exists(data, errors)
 
-    current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.registration().exists",
-        "errors": errors
-    })
+    current_app.logger.debug(
+        {"FUNCTION-CALL": "accounts.registration().exists", "errors": errors}
+    )
 
     # If errors are found return to client
     if bool(errors):
@@ -81,33 +77,31 @@ def registration(data: dict):
     # Create a new account
     payload = {
         "country": get_value(data=data, key="country"),
-        "account_name": get_value(data=data, key="account_name")
+        "account_name": get_value(data=data, key="account_name"),
     }
     account_result = accounts.create(payload)
 
     # Create a new user
     payload = {
         "account_id": get_value(data=account_result, key="account_id"),
-        "email": get_value(data=data, key="email")
+        "email": get_value(data=data, key="email"),
     }
 
-    current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.registration().user-payload",
-        "payload": payload
-    })
+    current_app.logger.debug(
+        {"FUNCTION-CALL": "accounts.registration().user-payload", "payload": payload}
+    )
 
     user_result = users.create(payload)
 
     # Create a new store
     payload = {
         "account_id": get_value(data=account_result, key="account_id"),
-        "store_name": get_value(data=data, key="account_name")
+        "store_name": get_value(data=data, key="account_name"),
     }
 
-    current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.registration().store-payload",
-        "payload": payload
-    })
+    current_app.logger.debug(
+        {"FUNCTION-CALL": "accounts.registration().store-payload", "payload": payload}
+    )
 
     store_result = stores.create(payload)
 
@@ -144,7 +138,7 @@ def create(data: dict) -> Union[Account, dict, list, None]:
 
     country = pycountry.countries.get(alpha_2=get_value(data, "country", "").upper())
     if bool(country):
-        country2 = country.alpha_2.lower() if hasattr(country, 'alpha_2') else "pt"
+        country2 = country.alpha_2.lower() if hasattr(country, "alpha_2") else "pt"
     else:
         country2 = "pt"
 
@@ -161,14 +155,16 @@ def create(data: dict) -> Union[Account, dict, list, None]:
         found = False
 
     # DEBUG :: Log country
-    current_app.logger.debug({
-        "FUNCTION-CALL": "accounts.create()",
-        "country": country,
-        "country2": country2,
-        "errors_account_registration": account_errors,
-        "name": account_name,
-        "found": found
-    })
+    current_app.logger.debug(
+        {
+            "FUNCTION-CALL": "accounts.create()",
+            "country": country,
+            "country2": country2,
+            "errors_account_registration": account_errors,
+            "name": account_name,
+            "found": found,
+        }
+    )
 
     response = {}
 
@@ -177,7 +173,7 @@ def create(data: dict) -> Union[Account, dict, list, None]:
             "status_id": StatusType.NEW.value,
             "address_id": None,
             "account_name": data.get("account_name"),
-            "country": country2
+            "country": country2,
         }
 
         account = Account(**payload)
