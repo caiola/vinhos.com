@@ -41,7 +41,7 @@ def get_by(pk: int = None, name: str = None) -> Account:
         raise ValueError("Provide pk or name")
 
     if name:
-        params["account_name"] = str(name)
+        params["account_name"] = name
 
     if pk:
         params["pk"] = pk
@@ -142,13 +142,13 @@ def create(data: dict) -> Union[Account, dict, list, None]:
     # Instantiate the schema
     schema = AccountCreateSchema()
 
-    country = pycountry.countries.get(alpha_2=data.get("country").upper())
-    if country is None:
-        country2 = "pt"
-    else:
+    country = pycountry.countries.get(alpha_2=get_value(data, "country", "").upper())
+    if bool(country):
         country2 = country.alpha_2.lower() if hasattr(country, 'alpha_2') else "pt"
+    else:
+        country2 = "pt"
 
-    account_name = data.get("account_name").lower()
+    account_name = get_value(data, "account_name", "").lower()
 
     account_errors = []
 
