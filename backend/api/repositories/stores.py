@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from api.models import Store
 from api.models.status_type import StatusType
-from api.models.tools import utils
+from api.models.utils import get_value, add_error
 from api.repositories import stores
 
 
@@ -39,13 +39,13 @@ def update(store: Store, **kwargs) -> Store:
 
 
 def exists(data, errors) -> Any:
-    account_id = utils().get_value(data, "account_id", 0)
+    account_id = get_value(data, "account_id", 0)
 
     found = False
     try:
         store = stores.get_by(id=account_id)
         if store is not None:
-            utils().add_error(errors, "account", "Store already exists")
+            add_error(errors, "account", "Store already exists")
         found = True
     except NoResultFound:
         pass
@@ -79,7 +79,7 @@ def create(data: dict) -> Union[Store, None]:
             for msg in msgs
         ]
 
-    account_id = utils().get_value(data, "account_id")
+    account_id = get_value(data, "account_id")
 
     if not account_id:
         store_errors.append(

@@ -8,7 +8,7 @@ from sqlalchemy.exc import NoResultFound
 
 from api.models import Account
 from api.models.status_type import StatusType
-from api.models.tools import utils
+from api.models.utils import get_value, add_error
 from api.repositories import users, accounts, stores
 
 
@@ -75,20 +75,20 @@ def registration(data: dict):
     })
 
     # If errors are found return to client
-    # if bool(errors):
-    #     return {"errors": errors}
+    if bool(errors):
+        return {"errors": errors}
 
     # Create a new account
     payload = {
-        "country": utils().get_value(data=data, key="country"),
-        "account_name": utils().get_value(data=data, key="account_name")
+        "country": get_value(data=data, key="country"),
+        "account_name": get_value(data=data, key="account_name")
     }
     account_result = accounts.create(payload)
 
     # Create a new user
     payload = {
-        "account_id": utils().get_value(data=account_result, key="account_id"),
-        "email": utils().get_value(data=data, key="email")
+        "account_id": get_value(data=account_result, key="account_id"),
+        "email": get_value(data=data, key="email")
     }
 
     current_app.logger.debug({
@@ -100,8 +100,8 @@ def registration(data: dict):
 
     # Create a new store
     payload = {
-        "account_id": utils().get_value(data=account_result, key="account_id"),
-        "store_name": utils().get_value(data=data, key="account_name")
+        "account_id": get_value(data=account_result, key="account_id"),
+        "store_name": get_value(data=data, key="account_name")
     }
 
     current_app.logger.debug({
@@ -120,13 +120,13 @@ def registration(data: dict):
 
 
 def exists(data, errors) -> Any:
-    account_name = utils().get_value(data, "account_name", "").lower()
+    account_name = get_value(data, "account_name", "").lower()
 
     found = False
     try:
         account = accounts.get_by(name=account_name)
         if account is not None:
-            utils().add_error(errors, "account", "Account name already exists")
+            add_error(errors, "account", "Account name already exists")
         found = True
     except NoResultFound:
         pass
@@ -156,7 +156,7 @@ def create(data: dict) -> Union[Account, dict, list, None]:
     try:
         accounts.get_by(name=account_name)
         found = True
-        utils().add_error(account_errors, "account", "Account name already exists")
+        add_error(account_errors, "account", "Account name already exists")
     except NoResultFound as err:
         found = False
 

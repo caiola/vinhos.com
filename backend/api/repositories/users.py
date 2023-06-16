@@ -11,7 +11,7 @@ from werkzeug.security import generate_password_hash
 
 from api.models import User
 from api.models.status_type import StatusType
-from api.models.tools import utils
+from api.models.utils import get_value, add_error
 from api.repositories import users
 
 
@@ -63,16 +63,16 @@ def update(user: User, **kwargs) -> User:
 
 
 def exists(data, errors) -> Any:
-    email = utils().get_value(data, "email", "").lower()
+    email = get_value(data, "email", "").lower()
 
     found = False
     try:
         user = users.get_by(email=email)
         if user is not None:
-            utils().add_error(errors, "user", "Email already exists")
+            add_error(errors, "user", "Email already exists")
         found = True
     except ValueError as err:
-        utils().add_error(errors, "user", err.args[0])
+        add_error(errors, "user", err.args[0])
         pass
     except NoResultFound:
         pass
@@ -101,7 +101,7 @@ def create(data: dict) -> Union[User, None]:
             for msg in msgs
         ]
 
-    account_id = utils().get_value(data, "account_id")
+    account_id = get_value(data, "account_id")
 
     if not account_id:
         user_errors.append(
@@ -110,7 +110,7 @@ def create(data: dict) -> Union[User, None]:
         payload = {
             "status_id": StatusType.NEW.value,
             "account_id": account_id,
-            "email": utils().get_value(data, "email"),
+            "email": get_value(data, "email"),
             # password is 16 bytes random -> 32 chars in hex
             "password_hash": generate_password_hash(secrets.token_hex(16)),
         }
