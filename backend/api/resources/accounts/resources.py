@@ -2,7 +2,7 @@
 from flask import request
 from flask_jwt_extended import jwt_required
 
-from api.repositories import accounts
+from api.repositories import registration
 from api.resources.base_resource import BaseResource
 
 
@@ -18,7 +18,7 @@ class AccountsResource(BaseResource):
         else:
             data = None
 
-        result = accounts.registration(data)
+        result = registration.registration(data)
 
         # Do not send password_hash
         try:

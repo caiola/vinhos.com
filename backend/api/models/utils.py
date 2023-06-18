@@ -7,11 +7,11 @@ def get_value(data, key, default=None) -> Any:
         return default
     try:
         return data[key]
+    except TypeError:
+        return getattr(data, key, default)
     except AttributeError:
         return default
     except KeyError:
-        return default
-    except TypeError:
         return default
 
 

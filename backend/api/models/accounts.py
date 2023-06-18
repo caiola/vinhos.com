@@ -24,6 +24,9 @@ class Account(db.Model, BaseModel, metaclass=MetaBaseModel):
         db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id"
     )
     address_id = db.Column(db.BigInteger(), nullable=True, comment="Address id")
+    user_id = db.Column(
+        db.BigInteger(), nullable=True, comment="Administrator user of the account"
+    )
 
     account_name = db.Column(
         db.String(60),

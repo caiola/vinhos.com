@@ -56,7 +56,7 @@ def get_by(
 
 
 def update(user: User, **kwargs) -> User:
-    """Update a user's age"""
+    """Update user"""
     user.update(kwargs)
     return user.save()
 
@@ -79,31 +79,31 @@ def exists(data, errors) -> Any:
     return found
 
 
-def create(data: dict) -> Union[User, None]:
+def create(data: dict, errors: list) -> Union[User, None]:
     """
     Create a new user
     """
-    response = {}
+    user = None
 
     # Instantiate the schema
-    schema = UserCreateSchema(unknown=EXCLUDE)
+    schema = UserCreateSchema()
 
     # Validate data
-    result = None
     try:
-        result = schema.load(data=data, partial=False, unknown=RAISE)
-        user_errors = []
+        schema.load(data=data, partial=False, unknown=RAISE)
     except ValidationError as err:
-        user_errors = [
-            {"ref": ref, "message": msg}
-            for ref, msgs in err.messages.items()
-            for msg in msgs
-        ]
+        errors.append(
+            [
+                {"ref": ref, "message": msg}
+                for ref, msgs in err.messages.items()
+                for msg in msgs
+            ]
+        )
 
     account_id = get_value(data, "account_id")
 
     if not account_id:
-        user_errors.append(
+        errors.append(
             {
                 "ref": "user.account_id",
                 "message": "Account id is undefined. Cannot proceed with user creation",
@@ -120,27 +120,20 @@ def create(data: dict) -> Union[User, None]:
 
         user = User(**payload)
 
-        # Catch all exceptions because we dont want to log password_hash that is generated
         try:
             # refresh to get details after save
             user = user.save(refresh=True)
         except (IntegrityError, PyMySQLIntegrityError) as err:
-            user = None
-            user_errors.append(
+            errors.append(
                 {
                     "ref": "email",
                     # "message": "A user with this email already exists. Please use a different email.",
                     "message": str(err),
                 }
             )
+        # Catch all exceptions because we don't want to log password_hash that is generated
         except Exception as e:
             user = None
-            user_errors.append({"ref": "email", "message": "Unknown exception"})
+            errors.append({"ref": "email", "message": "Unknown exception"})
 
-        if user:
-            response["user_id"] = user.id
-
-    if user_errors:
-        response["errors"] = user_errors
-
-    return response
+    return user

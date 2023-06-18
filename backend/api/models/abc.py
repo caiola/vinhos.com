@@ -82,6 +82,10 @@ class BaseModel:
             db.session.close()
         return self
 
+    def update(self, data):  # Built-in signature is => def update(self, E=None, **F):
+        db.session.update(self, data)
+        db.session.commit()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
