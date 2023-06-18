@@ -1,2 +1,2 @@
 #!/bin/sh
-poetry run pytest
+poetry run pytest --cov=api --cov-report=html:coverage_report
