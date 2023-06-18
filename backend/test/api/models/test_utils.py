@@ -1,6 +1,6 @@
 import unittest
 
-from api.models.utils import get_value, add_error
+from api.models.utils import add_error, get_value
 
 
 class GetValueTestCase(unittest.TestCase):

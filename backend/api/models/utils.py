@@ -14,6 +14,11 @@ def get_value(data: Any, key: str, default=None) -> Any:
 
 
 def add_error(errors: list, key: str, message: str):
-    if bool(key) is False or bool(message) is False or type(errors) != list or type(key) != str:
+    if (
+        bool(key) is False
+        or bool(message) is False
+        or type(errors) != list
+        or type(key) != str
+    ):
         return
-    errors += [{"ref": key, "message": message}]
+    errors.append({"ref": key, "message": message})
