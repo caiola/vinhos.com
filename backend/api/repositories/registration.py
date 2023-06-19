@@ -5,7 +5,7 @@ from flask import current_app
 
 from api import db
 from api.models.utils import get_value
-from api.repositories import accounts, stores, users
+from api.repositories import accounts, stores, users, verifications
 
 
 def registration(data: dict):
@@ -47,6 +47,7 @@ def registration(data: dict):
             "FUNCTION-CALL": "accounts.registration().user-payload",
             "payload": payload,
             "type": type(account_result),
+            "errors": errors,
         }
     )
 
@@ -86,6 +87,18 @@ def registration(data: dict):
 
     # @TODO Refactor to update() method, not sure why but BaseModel/abc.py is not working properly
     # account_result.update(payload)
+
+    # Create a new verification
+    payload = {
+        "user_id": user_id,
+    }
+
+    verification_result = verifications.create(payload, errors)
+    verification_id = get_value(data=verification_result, key="id")
+
+    current_app.logger.debug(
+        {"FUNCTION-CALL": "accounts.registration().verification_id", "verification_id": verification_id}
+    )
 
     # Merge response with account, user, store
     response = {
