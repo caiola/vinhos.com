@@ -10,8 +10,3 @@ class AddressType(Enum):
     USER = "user"
     BILLING = "billing"
     PICKUP = "pickup"
-
-
-class AddressTypeLowercase(Enum):
-    def __call__(self, *args, **kwargs):
-        return str(self.name).lower()

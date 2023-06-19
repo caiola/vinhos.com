@@ -1,11 +1,17 @@
 """
 Define the Address model
 """
+from enum import Enum
+
 from . import db
 from .abc import BaseModel, MetaBaseModel
-from .address_type import AddressType, AddressTypeLowercase
+from .address_type import AddressType
 from .database import Database
 from .status_type import StatusType
+
+
+def lowercase_enum(enum_class):
+    return db.Enum(*(item.value.lower() for item in enum_class), name="lowercase_enum")
 
 
 class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
@@ -26,9 +32,9 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
     user_id = db.Column(db.BigInteger(), nullable=True, index=True, comment="Associate address with User id")
 
     address_type = db.Column(
-        AddressTypeLowercase(AddressType, name="address_type"),
+        lowercase_enum(AddressType),
         nullable=False,
-        comment="Address type (e.g. account,store,user,custom)",
+        comment="Address type (e.g. account,store,user,billing,pickup)",
     )
     designation = db.Column(
         db.String(50),
