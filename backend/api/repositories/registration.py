@@ -36,6 +36,9 @@ def registration(data: dict):
 
     account_id = get_value(data=account_result, key="id")
 
+    if not account_id:
+        return {**{"errors": errors}}
+
     # Create a new user
     payload = {
         "account_id": account_id,
@@ -91,13 +94,17 @@ def registration(data: dict):
     # Create a new verification
     payload = {
         "user_id": user_id,
+        "action": "user",
     }
 
     verification_result = verifications.create(payload, errors)
     verification_id = get_value(data=verification_result, key="id")
 
     current_app.logger.debug(
-        {"FUNCTION-CALL": "accounts.registration().verification_id", "verification_id": verification_id}
+        {
+            "FUNCTION-CALL": "accounts.registration().verification_id",
+            "verification_id": verification_id,
+        }
     )
 
     # Merge response with account, user, store

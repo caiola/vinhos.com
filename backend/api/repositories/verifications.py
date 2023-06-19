@@ -1,19 +1,21 @@
 """ Defines the Verification repository """
 
-import uuid
-from typing import Union
+from datetime import datetime
 
 import pytz
+import uuid
 from marshmallow import Schema, ValidationError, fields
 from pymysql.err import IntegrityError as PyMySQLIntegrityError
 from sqlalchemy.exc import IntegrityError
+from typing import Union
 
-from api.models import User, Verification
+from api.models import Verification
 from api.models.utils import add_error, get_value
 
 
 class VerificationCreateSchema(Schema):
     user_id = fields.Int(required=True, error="Invalid user id")
+    action = fields.Str(required=False, error="Invalid action")
 
 
 # def exists(data, errors) -> bool:
@@ -34,7 +36,7 @@ class VerificationCreateSchema(Schema):
 #     return found
 
 
-def create(data: dict, errors: list) -> Union[User, None]:
+def create(data: dict, errors: list) -> Union[Verification, None]:
     """
     Create a new verification
     """
@@ -52,9 +54,9 @@ def create(data: dict, errors: list) -> Union[User, None]:
 
     payload = {
         "user_id": get_value(data, "user_id"),
-        "action": "registration",
+        "action": get_value(data, "action"),
         "token": uuid.uuid4(),
-        "date_created": pytz.timezone('UTC')
+        "date_created": datetime.now(pytz.utc),
     }
 
     verification = Verification(**payload)
@@ -66,9 +68,5 @@ def create(data: dict, errors: list) -> Union[User, None]:
         # "Verification for this kind already exists"
         verification = None
         add_error(errors, "verification", str(err))
-    # Catch all exceptions and don't report because we don't want to log password_hash that is generated
-    except Exception as e:
-        verification = None
-        add_error(errors, "verification", "Unknown exception")
 
     return verification

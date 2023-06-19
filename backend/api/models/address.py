@@ -24,12 +24,31 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
         Database.COLLATION_KEY: Database.COLLATION_VALUE,
     }
 
-    id = db.Column(db.BigInteger(), primary_key=True, nullable=False, comment="Primary key")
-    status_id = db.Column(db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id")
+    id = db.Column(
+        db.BigInteger(), primary_key=True, nullable=False, comment="Primary key"
+    )
+    status_id = db.Column(
+        db.Integer(), default=StatusType.NEW, nullable=False, comment="Status id"
+    )
 
-    account_id = db.Column(db.BigInteger(), nullable=True, index=True, comment="Associate address with Account id")
-    store_id = db.Column(db.BigInteger(), nullable=True, index=True, comment="Associate address with Store id")
-    user_id = db.Column(db.BigInteger(), nullable=True, index=True, comment="Associate address with User id")
+    account_id = db.Column(
+        db.BigInteger(),
+        nullable=True,
+        index=True,
+        comment="Associate address with Account id",
+    )
+    store_id = db.Column(
+        db.BigInteger(),
+        nullable=True,
+        index=True,
+        comment="Associate address with Store id",
+    )
+    user_id = db.Column(
+        db.BigInteger(),
+        nullable=True,
+        index=True,
+        comment="Associate address with User id",
+    )
 
     address_type = db.Column(
         lowercase_enum(AddressType),
@@ -42,7 +61,10 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
         comment="Designation is the internal name of the address",
     )
     is_default_address = db.Column(
-        db.SmallInteger(), nullable=True, index=True, comment="Is default address e.g. 0=No; 1=Yes"
+        db.SmallInteger(),
+        nullable=True,
+        index=True,
+        comment="Is default address e.g. 0=No; 1=Yes",
     )
 
     # country_id = db.Column(db.BigInteger(), nullable=True, comment="Country id")
@@ -66,7 +88,9 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
     number = db.Column(db.String(50), nullable=True, comment="Number")
 
     postal_code = db.Column(db.String(50), nullable=True, comment="Postal code")
-    additional_details = db.Column(db.String(250), nullable=True, comment="Additional details e.g. known places")
+    additional_details = db.Column(
+        db.String(250), nullable=True, comment="Additional details e.g. known places"
+    )
 
     email = db.Column(db.String(50), nullable=True, comment="Email")
     phone = db.Column(db.String(50), nullable=True, comment="Phone")

@@ -1,16 +1,15 @@
 """ Defines the Account repository """
-import json
 
 import pycountry
 from flask import current_app
-from marshmallow import Schema, ValidationError, fields, validate
+from marshmallow import RAISE, Schema, ValidationError, fields, validate
 from sqlalchemy.exc import NoResultFound
 from typing import Any, Union
 
 from api.models import Account
 from api.models.status_type import StatusType
 from api.models.utils import add_error, get_value
-from api.repositories import accounts, stores, users
+from api.repositories import accounts
 
 
 class AccountCreateSchema(Schema):
@@ -74,7 +73,7 @@ def create(data: dict, errors: list) -> Union[Account, None]:
 
     # Validate data
     try:
-        schema.load(data=data)
+        schema.load(data=data, partial=True, unknown=RAISE)
     except ValidationError as err:
         # Parse exceptions like marshmallow.exceptions.ValidationError: {'email': ['email-required']}
         for field, messages in err.messages.items():
