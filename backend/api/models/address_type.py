@@ -8,5 +8,10 @@ class AddressType(Enum):
     ACCOUNT = "account"
     STORE = "store"
     USER = "user"
-    # The address type "custom" can be used as billing address
-    CUSTOM = "custom"
+    BILLING = "billing"
+    PICKUP = "pickup"
+
+
+class AddressTypeLowercase(Enum):
+    def __call__(self, *args, **kwargs):
+        return str(self.name).lower()
