@@ -1,13 +1,13 @@
 """ Defines the User repository """
 import json
+
 import secrets
 import uuid
-from typing import Union
-
-from flask import current_app, abort
+from flask import abort, current_app
 from marshmallow import RAISE, Schema, ValidationError, fields, validate
 from pymysql.err import IntegrityError as PyMySQLIntegrityError
 from sqlalchemy.exc import IntegrityError, NoResultFound
+from typing import Union
 from werkzeug.security import generate_password_hash
 
 from api.models import User
@@ -30,7 +30,7 @@ class UserCreateSchema(Schema):
 
 
 def get_by(
-        pk: int = None, uuid: uuid.UUID = None, email: str = None
+    pk: int = None, uuid: uuid.UUID = None, email: str = None
 ) -> Union[User, None]:
     """Query a user by uuid or id"""
 
@@ -103,7 +103,11 @@ def create(data: dict, errors: list) -> Union[User, None]:
     account_id = get_value(data, "account_id")
 
     if not account_id:
-        add_error(errors, "account_id", "Account id is undefined. Cannot proceed with user creation")
+        add_error(
+            errors,
+            "account_id",
+            "Account id is undefined. Cannot proceed with user creation",
+        )
         return None
 
     payload = {

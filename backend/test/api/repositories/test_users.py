@@ -6,7 +6,7 @@ from sqlalchemy.exc import NoResultFound
 
 from api.models import User
 from api.repositories import users
-from api.repositories.users import get_by, exists, UserCreateSchema, create
+from api.repositories.users import UserCreateSchema, create, exists, get_by
 
 
 # @TODO FIX get by pk
@@ -122,13 +122,17 @@ def test_create_with_invalid_data(app):
     with app.app_context():
         with patch.object(UserCreateSchema, "load") as mock_load:
             mock_load.side_effect = ValidationError(
-                {"account_id": ["Missing data for required field."], "email": ["email-required"]})
+                {
+                    "account_id": ["Missing data for required field."],
+                    "email": ["email-required"],
+                }
+            )
             result = create(data, errors)
     assert result is None
     assert len(errors) > 0
     assert errors == [
         {"ref": "account_id", "message": "Missing data for required field."},
-        {"ref": "email", "message": "email-required"}
+        {"ref": "email", "message": "email-required"},
     ]
 
     def test_create_with_invalid_account_id(app):
@@ -137,7 +141,8 @@ def test_create_with_invalid_data(app):
         with app.app_context():
             with patch.object(UserCreateSchema, "load") as mock_load:
                 mock_load.side_effect = ValidationError(
-                    {"account_id": ["Missing data for required field."]})
+                    {"account_id": ["Missing data for required field."]}
+                )
                 result = create(data, errors)
         assert result is None
         assert len(errors) > 0
@@ -164,8 +169,13 @@ def test_create_with_invalid_data(app):
         with app.app_context():
             with patch.object(UserCreateSchema, "load") as mock_load:
                 mock_load.side_effect = ValidationError(
-                    {"account_id": ["Missing data for required field."], "email": ["email-required"],
-                     'xyz_account_id': ['Unknown field.'], 'abc_email': ['Unknown field.']})
+                    {
+                        "account_id": ["Missing data for required field."],
+                        "email": ["email-required"],
+                        "xyz_account_id": ["Unknown field."],
+                        "abc_email": ["Unknown field."],
+                    }
+                )
                 result = create(data, errors)
         assert result is None
         assert len(errors) > 0
