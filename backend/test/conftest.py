@@ -26,14 +26,16 @@ def client(app):
 def db(app, request):
     """Session-wide test database."""
 
-    def teardown():
-        _db.drop_all()
+    # @TODO Dont drop tables from the database. Improve this code later
+    # def teardown():
+    #    _db.drop_all()
 
     _db.app = app
 
     # flask_migrate_upgrade(directory="migrations")
     _db.create_all()
-    request.addfinalizer(teardown)
+    # @TODO Dont drop tables from the database. Improve this code later
+    # request.addfinalizer(teardown)
     return _db
 
 
