@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: 3.x
 
+      - name: Navigate to backend folder
+        run: cd backend
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
