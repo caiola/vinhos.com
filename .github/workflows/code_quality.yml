@@ -32,11 +32,9 @@ jobs:
       - name: Isort
         working-directory: ./backend
         run: poetry run isort . --check-only --profile black
-        
-      - name: Navigate to backend folder
-        run: cd backend
 
       - name: Run tests and generate coverage
+        working-directory: ./backend
         run: poetry run pytest -vv --cov=api tests/
 
       - name: Upload coverage reports to Codecov
