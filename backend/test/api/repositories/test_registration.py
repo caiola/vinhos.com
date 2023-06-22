@@ -91,13 +91,13 @@ def test_create_new_account_with_empty_data(app):
 #     with app.app_context():
 #         with patch("api.repositories.accounts.get_by") as mock_get_by:
 #             mock_get_by.side_effect = NoResultFound()
-# 
+#
 #             # Mock the Account save method to return a dummy account
 #             with patch.object(Account, "save") as mock_save:
 #                 mock_save.return_value = None
-# 
+#
 #                 result = create(data, errors)
-# 
+#
 #     # Verify that the function created a new account
 #     assert not isinstance(result, Account)
 #     expected = [
@@ -105,12 +105,12 @@ def test_create_new_account_with_empty_data(app):
 #         {"ref": "country", "message": "Length must be between 2 and 2."},
 #         {"ref": "email", "message": "email-invalid"},
 #     ]
-# 
+#
 #     errors = sorted(data, key=lambda x: x["ref"])
-# 
+#
 #     # Check if it is a subset
 #     assert expected == errors
-# 
+#
 #     assert len(errors) == 3
 
 
