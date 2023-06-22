@@ -101,10 +101,12 @@ def test_create_new_account_with_empty_fields(app):
     # Verify that the function created a new account
     assert not isinstance(result, Account)
     expected = [
-        {"ref": "country", "message": "Length must be between 2 and 2."},
         {"ref": "account_name", "message": "Shorter than minimum length 3."},
+        {"ref": "country", "message": "Length must be between 2 and 2."},
         {"ref": "email", "message": "email-invalid"},
     ]
+
+    errors = sorted(data, key=lambda x: x["ref"])
 
     # Check if it is a subset
     assert expected == errors
