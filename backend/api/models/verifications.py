@@ -8,6 +8,8 @@ from sqlalchemy import UniqueConstraint, func
 from . import db
 from .abc import BaseModel, MetaBaseModel
 from .database import Database
+from .utils import lowercase_enum
+from .verification_type import VerificationType
 
 
 class Verification(db.Model, BaseModel, metaclass=MetaBaseModel):
@@ -15,7 +17,7 @@ class Verification(db.Model, BaseModel, metaclass=MetaBaseModel):
 
     __tablename__ = "verification"
     __table_args__ = (
-        UniqueConstraint("user_id", "action", "token", name="ad_user_action_token"),
+        UniqueConstraint("user_id", "type", "token", name="ad_user_type_token"),
         {
             Database.ENGINE_KEY: Database.ENGINE_VALUE,
             Database.CHARSET_KEY: Database.CHARSET_VALUE,
@@ -27,8 +29,10 @@ class Verification(db.Model, BaseModel, metaclass=MetaBaseModel):
         db.BigInteger(), primary_key=True, nullable=False, comment="Primary key"
     )
     user_id = db.Column(db.BigInteger(), nullable=False, comment="User id")
-    action = db.Column(
-        db.String(10), nullable=False, comment="Verification action e.g. user"
+    type = db.Column(
+        lowercase_enum(VerificationType),
+        nullable=False,
+        comment="Verification type (e.g. user,email,otp)",
     )
     token = db.Column(
         db.String(64), nullable=False, unique=True, comment="Unique token"
