@@ -1,4 +1,4 @@
-# Vinhos.com [![CircleCI](https://circleci.com/gh/antkahn/flask-api-starter-kit/tree/master.svg?style=svg)](https://circleci.com/gh/antkahn/flask-api-starter-kit/tree/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/antkahn/flask-api-starter-kit/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/antkahn/flask-api-starter-kit/?branch=master)
+# Vinhos.com [![codecov](https://codecov.io/gh/caiola/vinhos.com/branch/develop/graph/badge.svg?token=1JNNGN2VYK)](https://codecov.io/gh/caiola/vinhos.com)
 
 Welcome to Vinhos.com, the revolutionary open source platform for all things and wines!
 Our mission is to bring the wine industry into the 21st century by sharing knowledge and source code openly.
