@@ -33,6 +33,9 @@ jobs:
         working-directory: ./backend
         run: poetry run isort . --check-only --profile black
         
+      - name: Navigate to backend folder
+        run: cd backend
+
       - name: Run tests and generate coverage
         run: poetry run pytest -vv --cov=api tests/
 
