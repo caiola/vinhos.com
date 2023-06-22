@@ -48,16 +48,16 @@ jobs:
 
       - name: Black
         working-directory: ./backend
-        run: echo poetry run black . --check
+        run: poetry run black . --check
 
       - name: Isort
         working-directory: ./backend
-        run: echo poetry run isort . --check-only --profile black
+        run: poetry run isort . --check-only --profile black
 
       - name: Run tests and generate coverage
         working-directory: ./backend
         # Turn result to always true to run codecoverage
-        run: ls && poetry run pytest test/ -vv --cov=api --cov-report=xml || true
+        run: poetry run pytest test/ -vv --cov=api --cov-report=xml
 
       - name: ls backend
         run: |
