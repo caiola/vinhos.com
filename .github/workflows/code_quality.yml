@@ -47,7 +47,7 @@ jobs:
 
       - name: Run tests and generate coverage
         working-directory: ./backend
-        run: ls && poetry run pytest -vv --cov=api tests
+        run: ls && poetry run pytest -vv --cov=api ./tests/
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v2
