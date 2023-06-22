@@ -59,19 +59,11 @@ jobs:
         # Turn result to always true to run codecoverage
         run: ls && poetry run pytest test/ -vv --cov=api --cov-report=xml || true
 
-      - name: Upload coverage reports to Codecov
+      - name: ls backend
         run: |
           ls ./backend
-          echo "Running Codecov action..."
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload coverage reports to Codecov
-        run: |
           ls ./backend/test
-          echo "Running Codecov action..."
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          echo "Running Codecov -> ls action ..."
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
@@ -79,5 +71,5 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           working-directory: ./backend
-         # coverage report
+          # coverage report
           files: ./coverage.xml
