@@ -34,9 +34,7 @@ jobs:
         run: poetry run isort . --check-only --profile black
         
       - name: Run tests and generate coverage
-        # run: pytest --cov=my_project tests/
-        # run: pytest --cov=api --cov-report=html:coverage_report
-        run: pytest --cov=api tests/
+        run: poetry run pytest -vv --cov=api tests/
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v2
