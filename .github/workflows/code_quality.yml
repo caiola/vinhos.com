@@ -57,7 +57,7 @@ jobs:
       - name: Run tests and generate coverage
         working-directory: ./backend
         # Turn result to always true to run codecoverage
-        run: poetry run pytest test/ -vv --cov=api --cov-report=xml || True
+        run: poetry run pytest test/ -vv --cov=api --cov-report=xml || true
 
       - name: ls backend
         run: |
