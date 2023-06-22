@@ -48,7 +48,7 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
     )
 
     address_type = db.Column(
-        lowercase_enum(AddressType),
+        lowercase_enum(db.Enum, AddressType),
         nullable=False,
         comment="Address type (e.g. account,store,user,billing,pickup)",
     )

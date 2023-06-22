@@ -30,7 +30,7 @@ class Verification(db.Model, BaseModel, metaclass=MetaBaseModel):
     )
     user_id = db.Column(db.BigInteger(), nullable=False, comment="User id")
     type = db.Column(
-        lowercase_enum(VerificationType),
+        lowercase_enum(db.Enum, VerificationType),
         nullable=False,
         comment="Verification type (e.g. user,email,otp)",
     )

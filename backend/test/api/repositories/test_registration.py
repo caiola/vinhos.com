@@ -38,13 +38,19 @@ def test_create_new_account(app):
     # Mock the accounts.get_by method to simulate no existing account
     with app.app_context():
         with patch("api.repositories.accounts.get_by") as mock_get_by:
-            mock_get_by.side_effect = NoResultFound()
+            with patch("pycountry.countries.get") as mock_countries_by:
+                mock_get_by.side_effect = NoResultFound()
 
-            # Mock the Account save method to return a dummy account
-            with patch.object(Account, "save") as mock_save:
-                mock_save.return_value = Account(id=123, account_name="example_account")
+                # It is wrong but should fallback to "pt" anyways
+                mock_countries_by.side_effect = "pt"
 
-                result = create(data, errors)
+                # Mock the Account save method to return a dummy account
+                with patch.object(Account, "save") as mock_save:
+                    mock_save.return_value = Account(
+                        id=123, account_name="example_account"
+                    )
+
+                    result = create(data, errors)
 
     # Verify that the function created a new account
     assert isinstance(result, Account)
@@ -52,7 +58,7 @@ def test_create_new_account(app):
     assert len(errors) == 0
 
 
-def test_create_new_account_with_missing_fields(app):
+def test_create_new_account_with_empty_data(app):
     data = {}
     errors = []
     # Mock the accounts.get_by method to simulate no existing account
@@ -69,8 +75,76 @@ def test_create_new_account_with_missing_fields(app):
     # Verify that the function created a new account
     assert not isinstance(result, Account)
     assert errors == [
-        {"ref": "country", "message": "Missing data for required field."},
-        {"ref": "account_name", "message": "Missing data for required field."},
-        {"ref": "email", "message": "email-required"},
+        {"ref": "account", "message": "Data is empty."},
+    ]
+    assert len(errors) == 1
+
+
+def test_create_new_account_with_empty_fields(app):
+    data = {
+        "country": "",
+        "account_name": "",
+        "email": "",
+    }
+    errors = []
+    # Mock the accounts.get_by method to simulate no existing account
+    with app.app_context():
+        with patch("api.repositories.accounts.get_by") as mock_get_by:
+            mock_get_by.side_effect = NoResultFound()
+
+            # Mock the Account save method to return a dummy account
+            with patch.object(Account, "save") as mock_save:
+                mock_save.return_value = None
+
+                result = create(data, errors)
+
+    # Verify that the function created a new account
+    assert not isinstance(result, Account)
+    assert errors == [
+        {"ref": "account_name", "message": "Shorter than minimum length 3."},
+        {"ref": "country", "message": "Length must be between 2 and 2."},
+        {"ref": "email", "message": "email-invalid"},
     ]
     assert len(errors) == 3
+
+
+def test_create_new_account_with_unknown_field(app):
+    data = {"test": "abc"}
+    errors = []
+    # Mock the accounts.get_by method to simulate no existing account
+    with app.app_context():
+        with patch("api.repositories.accounts.get_by") as mock_get_by:
+            mock_get_by.side_effect = NoResultFound()
+
+            # Mock the Account save method to return a dummy account
+            with patch.object(Account, "save") as mock_save:
+                mock_save.return_value = None
+
+                result = create(data, errors)
+
+    # Verify that the function created a new account
+    assert not isinstance(result, Account)
+    assert errors == [{"ref": "test", "message": "Unknown field."}]
+    assert len(errors) == 1
+
+
+def test_create_new_account_with_missing_fields(app):
+    data = {"account_name": ""}
+    errors = []
+    # Mock the accounts.get_by method to simulate no existing account
+    with app.app_context():
+        with patch("api.repositories.accounts.get_by") as mock_get_by:
+            mock_get_by.side_effect = NoResultFound()
+
+            # Mock the Account save method to return a dummy account
+            with patch.object(Account, "save") as mock_save:
+                mock_save.return_value = None
+
+                result = create(data, errors)
+
+    # Verify that the function created a new account
+    assert not isinstance(result, Account)
+    assert errors == [
+        {"ref": "account_name", "message": "Shorter than minimum length 3."},
+    ]
+    assert len(errors) == 1
