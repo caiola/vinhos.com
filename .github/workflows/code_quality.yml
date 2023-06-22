@@ -15,6 +15,15 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Cache Poetry dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('backend/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v1
         with:
