@@ -1,11 +1,14 @@
 """
-Define the User model
+Define the Address model
 """
+from enum import Enum
+
 from . import db
 from .abc import BaseModel, MetaBaseModel
 from .address_type import AddressType
 from .database import Database
 from .status_type import StatusType
+from .utils import lowercase_enum
 
 
 class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
@@ -26,19 +29,28 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
     )
 
     account_id = db.Column(
-        db.BigInteger(), nullable=True, comment="Associate address with Account id"
+        db.BigInteger(),
+        nullable=True,
+        index=True,
+        comment="Associate address with Account id",
     )
     store_id = db.Column(
-        db.BigInteger(), nullable=True, comment="Associate address with Store id"
+        db.BigInteger(),
+        nullable=True,
+        index=True,
+        comment="Associate address with Store id",
     )
     user_id = db.Column(
-        db.BigInteger(), nullable=True, comment="Associate address with User id"
+        db.BigInteger(),
+        nullable=True,
+        index=True,
+        comment="Associate address with User id",
     )
 
     address_type = db.Column(
-        db.Enum([e.value for e in AddressType], name="address_type"),
+        lowercase_enum(db.Enum, AddressType),
         nullable=False,
-        comment="Address type (e.g. account,store,user,custom)",
+        comment="Address type (e.g. account,store,user,billing,pickup)",
     )
     designation = db.Column(
         db.String(50),
@@ -46,26 +58,22 @@ class Address(db.Model, BaseModel, metaclass=MetaBaseModel):
         comment="Designation is the internal name of the address",
     )
     is_default_address = db.Column(
-        db.Byte(), nullable=True, comment="Is default address e.g. 0=No; 1=Yes"
+        db.SmallInteger(),
+        nullable=True,
+        index=True,
+        comment="Is default address e.g. 0=No; 1=Yes",
     )
 
-    country_id = db.Column(db.BigInteger(), nullable=True, comment="Country id")
-    country = db.Column(db.String(50), nullable=True, comment="Country name")
+    country = db.Column(db.String(2), nullable=True, comment="Country alpha2")
 
-    district_id = db.Column(db.BigInteger(), nullable=True, comment="District id")
     district = db.Column(db.String(50), nullable=True, comment="District name")
 
-    municipality_id = db.Column(
-        db.BigInteger(), nullable=True, comment="Municipality id"
-    )
     municipality = db.Column(db.String(50), nullable=True, comment="Municipality name")
 
-    parish_id = db.Column(db.BigInteger(), nullable=True, comment="Parish id")
     parish = db.Column(db.String(50), nullable=True, comment="Parish name")
 
     zone = db.Column(db.String(50), nullable=True, comment="Zone")
 
-    street_id = db.Column(db.BigInteger(), nullable=True, comment="Street id")
     street = db.Column(db.String(50), nullable=True, comment="Street name")
 
     floor = db.Column(db.String(50), nullable=True, comment="Floor")

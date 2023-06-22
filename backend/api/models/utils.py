@@ -22,3 +22,7 @@ def add_error(errors: list, key: str, message: str):
     ):
         return
     errors.append({"ref": key, "message": message})
+
+
+def lowercase_enum(enum, enum_class):
+    return enum(*(item.value.lower() for item in enum_class), name="lowercase_enum")

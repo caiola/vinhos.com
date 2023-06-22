@@ -1,21 +1,24 @@
 """ Defines the Account repository """
-import json
 
 import pycountry
 from flask import current_app
-from marshmallow import Schema, ValidationError, fields, validate
+from marshmallow import RAISE, Schema, ValidationError, fields, validate
 from sqlalchemy.exc import NoResultFound
 from typing import Any, Union
 
 from api.models import Account
 from api.models.status_type import StatusType
 from api.models.utils import add_error, get_value
-from api.repositories import accounts, stores, users
+from api.repositories import accounts
 
 
 class AccountCreateSchema(Schema):
-    country = fields.Str(required=True, error="Invalid account name")
-    account_name = fields.Str(required=True, error="Invalid account name")
+    country = fields.Str(
+        required=True, validate=validate.Length(min=2, max=2), error="Invalid country"
+    )
+    account_name = fields.Str(
+        required=True, validate=validate.Length(min=3), error="Invalid account name"
+    )
     email = fields.Str(
         required=True,
         validate=validate.Email(error="email-invalid"),
@@ -72,15 +75,22 @@ def create(data: dict, errors: list) -> Union[Account, None]:
     # Instantiate the schema
     schema = AccountCreateSchema()
 
+    # Check for empty data
+    if not data:
+        add_error(errors, "account", "Data is empty.")
+        return None
+
     # Validate data
     try:
-        schema.load(data=data)
+        schema.load(data=data, partial=True, unknown=RAISE)
     except ValidationError as err:
         # Parse exceptions like marshmallow.exceptions.ValidationError: {'email': ['email-required']}
         for field, messages in err.messages.items():
             for message in messages:
                 add_error(errors, field, message)
         return None
+
+    print(errors)
 
     # Always assume "pt" (Portugal) by default, if not defined
     country = pycountry.countries.get(alpha_2=get_value(data, "country", "").upper())
@@ -94,12 +104,12 @@ def create(data: dict, errors: list) -> Union[Account, None]:
     # @TODO Refactor to use method .exists()
     try:
         account = accounts.get_by(name=account_name)
-        found = True
         add_error(errors, "account", "Account name already exists")
         # Return account found to work like active pattern record
         return account
     except NoResultFound as err:
-        found = False
+        # We can proceed because the account name does not exist
+        pass
 
     # DEBUG :: Log country
     current_app.logger.debug(
@@ -109,7 +119,6 @@ def create(data: dict, errors: list) -> Union[Account, None]:
             "country2": country2,
             "errors_account_registration": errors,
             "name": account_name,
-            "found": found,
         }
     )
 
@@ -121,6 +130,8 @@ def create(data: dict, errors: list) -> Union[Account, None]:
         "account_name": data.get("account_name"),
         "country": country2,
     }
+
+    print(payload)
 
     account = Account(**payload)
 
