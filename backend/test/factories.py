@@ -2,6 +2,7 @@
 import factory
 
 from api.models import Account, Ad, Store, User, db
+from api.models.status_type import StatusType
 
 
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -9,7 +10,13 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = User
         sqlalchemy_session = db.session
 
+    status = StatusType.NEW.value
+    account_id = 123
+    email = factory.Faker("email")
+    # @TODO Enhance the code: password_hash = Meta.model.set_password("pw-hash")
+    password_hash = "pw-hash"
     first_name = factory.Faker("first_name")
+    middle_name = factory.Faker("middle_name")
     last_name = factory.Faker("last_name")
 
 

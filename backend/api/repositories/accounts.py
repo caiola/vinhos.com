@@ -1,19 +1,24 @@
 """ Defines the Account repository """
+
 import pycountry
 from flask import current_app
-from marshmallow import Schema, fields, validate
+from marshmallow import RAISE, Schema, ValidationError, fields, validate
 from sqlalchemy.exc import NoResultFound
 from typing import Any, Union
 
 from api.models import Account
 from api.models.status_type import StatusType
 from api.models.utils import add_error, get_value
-from api.repositories import accounts, stores, users
+from api.repositories import accounts
 
 
 class AccountCreateSchema(Schema):
-    country = fields.Str(required=True, error="Invalid account name")
-    account_name = fields.Str(required=True, error="Invalid account name")
+    country = fields.Str(
+        required=True, validate=validate.Length(min=2, max=2), error="Invalid country"
+    )
+    account_name = fields.Str(
+        required=True, validate=validate.Length(min=3), error="Invalid account name"
+    )
     email = fields.Str(
         required=True,
         validate=validate.Email(error="email-invalid"),
@@ -48,70 +53,6 @@ def get_by(pk: int = None, name: str = None) -> Account:
     return Account.query.filter_by(**params).one()
 
 
-def update(account: Account, **kwargs) -> Account:
-    """Update account"""
-    account.update(kwargs)
-    return account.save()
-
-
-def registration(data: dict):
-    response = {}
-
-    current_app.logger.debug({"FUNCTION-CALL": "accounts.registration()", "data": data})
-
-    # Check prerequisites: account name and email must be unique
-    errors = []
-
-    accounts.exists(data, errors)
-    users.exists(data, errors)
-
-    current_app.logger.debug(
-        {"FUNCTION-CALL": "accounts.registration().exists", "errors": errors}
-    )
-
-    # If errors are found return to client
-    if bool(errors):
-        return {"errors": errors}
-
-    # Create a new account
-    payload = {
-        "country": get_value(data=data, key="country"),
-        "account_name": get_value(data=data, key="account_name"),
-    }
-    account_result = accounts.create(payload)
-
-    # Create a new user
-    payload = {
-        "account_id": get_value(data=account_result, key="account_id"),
-        "email": get_value(data=data, key="email"),
-    }
-
-    current_app.logger.debug(
-        {"FUNCTION-CALL": "accounts.registration().user-payload", "payload": payload}
-    )
-
-    user_result = users.create(payload)
-
-    # Create a new store
-    payload = {
-        "account_id": get_value(data=account_result, key="account_id"),
-        "store_name": get_value(data=data, key="account_name"),
-    }
-
-    current_app.logger.debug(
-        {"FUNCTION-CALL": "accounts.registration().store-payload", "payload": payload}
-    )
-
-    store_result = stores.create(payload)
-
-    response = {**account_result, **user_result, **store_result}
-
-    if errors:
-        response = {**response, **{"errors": errors}}
-
-    return response
-
-
 def exists(data, errors) -> Any:
     account_name = get_value(data, "account_name", "").lower()
 
@@ -127,14 +68,31 @@ def exists(data, errors) -> Any:
     return found
 
 
-def create(data: dict) -> Union[Account, dict, list, None]:
+def create(data: dict, errors: list) -> Union[Account, None]:
     """
     Create a new account
     """
-
     # Instantiate the schema
     schema = AccountCreateSchema()
 
+    # Check for empty data
+    if not data:
+        add_error(errors, "account", "Data is empty.")
+        return None
+
+    # Validate data
+    try:
+        schema.load(data=data, partial=True, unknown=RAISE)
+    except ValidationError as err:
+        # Parse exceptions like marshmallow.exceptions.ValidationError: {'email': ['email-required']}
+        for field, messages in err.messages.items():
+            for message in messages:
+                add_error(errors, field, message)
+        return None
+
+    print(errors)
+
+    # Always assume "pt" (Portugal) by default, if not defined
     country = pycountry.countries.get(alpha_2=get_value(data, "country", "").upper())
     if bool(country):
         country2 = country.alpha_2.lower() if hasattr(country, "alpha_2") else "pt"
@@ -143,15 +101,15 @@ def create(data: dict) -> Union[Account, dict, list, None]:
 
     account_name = get_value(data, "account_name", "").lower()
 
-    account_errors = []
-
     # @TODO Refactor to use method .exists()
     try:
-        accounts.get_by(name=account_name)
-        found = True
-        add_error(account_errors, "account", "Account name already exists")
+        account = accounts.get_by(name=account_name)
+        add_error(errors, "account", "Account name already exists")
+        # Return account found to work like active pattern record
+        return account
     except NoResultFound as err:
-        found = False
+        # We can proceed because the account name does not exist
+        pass
 
     # DEBUG :: Log country
     current_app.logger.debug(
@@ -159,30 +117,29 @@ def create(data: dict) -> Union[Account, dict, list, None]:
             "FUNCTION-CALL": "accounts.create()",
             "country": country,
             "country2": country2,
-            "errors_account_registration": account_errors,
+            "errors_account_registration": errors,
             "name": account_name,
-            "found": found,
         }
     )
 
     response = {}
 
-    if not found:
-        payload = {
-            "status_id": StatusType.NEW.value,
-            "address_id": None,
-            "account_name": data.get("account_name"),
-            "country": country2,
-        }
+    payload = {
+        "status_id": StatusType.NEW.value,
+        "address_id": None,
+        "account_name": data.get("account_name"),
+        "country": country2,
+    }
 
-        account = Account(**payload)
+    print(payload)
 
-        account_result = account.save(refresh=True)
-        account_id = account_result.id
+    account = Account(**payload)
 
-        response["account_id"] = account_id
+    account_result = account.save(refresh=True)
+    account_id = account_result.id
 
-    if account_errors:
-        response["errors"] = account_errors
+    response["account_id"] = account_id
 
-    return response
+    #     response["errors"] = account_errors
+
+    return account

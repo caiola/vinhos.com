@@ -31,13 +31,8 @@ def get_by(pk: int = None, name: str = None) -> Store:
     return Store.query.filter_by(**params).one()
 
 
-def update(store: Store, **kwargs) -> Store:
-    """Update store"""
-    store.update(kwargs)
-    return store.save()
-
-
 def exists(data, errors) -> Any:
+    # @TODO Check if there is at least one store
     account_id = get_value(data, "account_id", 0)
 
     found = False
@@ -52,11 +47,12 @@ def exists(data, errors) -> Any:
     return found
 
 
-def create(data: dict) -> Union[Store, None]:
+def create(data: dict, errors: list) -> Union[Store, None]:
     """
     Create a new store
     """
-    response = {}
+
+    store = None
 
     data_validation = {
         "account_id": data["account_id"],
@@ -67,56 +63,49 @@ def create(data: dict) -> Union[Store, None]:
     schema = StoreCreateSchema(unknown=EXCLUDE)
 
     # Validate data
-    result = None
     try:
-        result = schema.load(data=data_validation, partial=False, unknown=RAISE)
-        store_errors = []
+        schema.load(data=data_validation, partial=False, unknown=RAISE)
     except ValidationError as err:
-        store_errors = [
-            {"ref": ref, "message": msg}
-            for ref, msgs in err.messages.items()
-            for msg in msgs
-        ]
+        errors.append(
+            [
+                {"ref": ref, "message": msg}
+                for ref, msgs in err.messages.items()
+                for msg in msgs
+            ]
+        )
 
     account_id = get_value(data, "account_id")
 
     if not account_id:
-        store_errors.append(
+        errors.append(
             {
                 "ref": "store.account_id",
                 "message": "Account id is undefined. Cannot proceed with user creation",
             }
         )
-    else:
-        payload = {
-            "status_id": StatusType.NEW.value,
-            "account_id": data["account_id"],
-            "store_name": data["store_name"],
-        }
+        return store
 
-        store = Store(**payload)
+    payload = {
+        "status_id": StatusType.NEW.value,
+        "account_id": data["account_id"],
+        "store_name": data["store_name"],
+    }
 
-        # Catch all exceptions because we dont want to log password_hash that is generated
-        try:
-            # refresh to get details after save
-            store = store.save(refresh=True)
-        except (IntegrityError, PyMySQLIntegrityError) as err:
-            store = None
-            store_errors.append(
-                {
-                    "ref": "email",
-                    # "message": "A user with this email already exists. Please use a different email.",
-                    "message": str(err),
-                }
-            )
-        except Exception as e:
-            store = None
-            store_errors.append({"ref": "email", "message": "Unknown exception"})
+    store = Store(**payload)
 
-        if store:
-            response["store_id"] = store.id
+    # Catch all exceptions because we dont want to log password_hash that is generated
+    try:
+        # refresh to get details after save
+        store = store.save(refresh=True)
+    except (IntegrityError, PyMySQLIntegrityError) as err:
+        errors.append(
+            {
+                "ref": "email",
+                # "message": "A user with this email already exists. Please use a different email.",
+                "message": str(err),
+            }
+        )
+    except Exception as e:
+        errors.append({"ref": "email", "message": "Unknown exception"})
 
-    if store_errors:
-        response["errors"] = store_errors
-
-    return response
+    return store

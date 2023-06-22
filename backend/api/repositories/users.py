@@ -1,11 +1,13 @@
 """ Defines the User repository """
+import json
+
 import secrets
 import uuid
-from flask import current_app
-from marshmallow import EXCLUDE, RAISE, Schema, ValidationError, fields, validate
+from flask import abort, current_app
+from marshmallow import RAISE, Schema, ValidationError, fields, validate
 from pymysql.err import IntegrityError as PyMySQLIntegrityError
 from sqlalchemy.exc import IntegrityError, NoResultFound
-from typing import Any, Union
+from typing import Union
 from werkzeug.security import generate_password_hash
 
 from api.models import User
@@ -55,13 +57,14 @@ def get_by(
     return None
 
 
-def update(user: User, **kwargs) -> User:
-    """Update a user's age"""
-    user.update(kwargs)
-    return user.save()
+# @TODO FIX update method - It is not working as expected
+# def update(user: User, **kwargs) -> User:
+#     """Update user"""
+#     user.update(kwargs)
+#     return user.save()
 
 
-def exists(data, errors) -> Any:
+def exists(data, errors) -> bool:
     email = get_value(data, "email", "").lower()
 
     found = False
@@ -69,7 +72,7 @@ def exists(data, errors) -> Any:
         user = users.get_by(email=email)
         if user is not None:
             add_error(errors, "user", "Email already exists")
-        found = True
+            found = True
     except ValueError as err:
         add_error(errors, "user", err.args[0])
         pass
@@ -79,68 +82,53 @@ def exists(data, errors) -> Any:
     return found
 
 
-def create(data: dict) -> Union[User, None]:
+def create(data: dict, errors: list) -> Union[User, None]:
     """
     Create a new user
     """
-    response = {}
-
     # Instantiate the schema
-    schema = UserCreateSchema(unknown=EXCLUDE)
+    schema = UserCreateSchema()
 
     # Validate data
-    result = None
     try:
-        result = schema.load(data=data, partial=False, unknown=RAISE)
-        user_errors = []
+        # schema.load(data=data, partial=False, unknown=RAISE)
+        schema.load(data=data)
     except ValidationError as err:
-        user_errors = [
-            {"ref": ref, "message": msg}
-            for ref, msgs in err.messages.items()
-            for msg in msgs
-        ]
+        # Parse exceptions like marshmallow.exceptions.ValidationError: {'email': ['email-required']}
+        for field, messages in err.messages.items():
+            for message in messages:
+                add_error(errors, field, message)
+        return None
 
     account_id = get_value(data, "account_id")
 
     if not account_id:
-        user_errors.append(
-            {
-                "ref": "user.account_id",
-                "message": "Account id is undefined. Cannot proceed with user creation",
-            }
+        add_error(
+            errors,
+            "account_id",
+            "Account id is undefined. Cannot proceed with user creation",
         )
-    else:
-        payload = {
-            "status_id": StatusType.NEW.value,
-            "account_id": account_id,
-            "email": get_value(data, "email"),
-            # password is 16 bytes random -> 32 chars in hex
-            "password_hash": generate_password_hash(secrets.token_hex(16)),
-        }
+        return None
 
-        user = User(**payload)
+    payload = {
+        "status_id": StatusType.NEW.value,
+        "account_id": account_id,
+        "email": get_value(data, "email"),
+        # password is 16 bytes random -> 32 chars in hex
+        "password_hash": generate_password_hash(secrets.token_hex(16)),
+    }
 
-        # Catch all exceptions because we dont want to log password_hash that is generated
-        try:
-            # refresh to get details after save
-            user = user.save(refresh=True)
-        except (IntegrityError, PyMySQLIntegrityError) as err:
-            user = None
-            user_errors.append(
-                {
-                    "ref": "email",
-                    # "message": "A user with this email already exists. Please use a different email.",
-                    "message": str(err),
-                }
-            )
-        except Exception as e:
-            user = None
-            user_errors.append({"ref": "email", "message": "Unknown exception"})
+    user = User(**payload)
 
-        if user:
-            response["user_id"] = user.id
+    try:
+        # refresh to get details after save
+        user = user.save(refresh=True)
+    except (IntegrityError, PyMySQLIntegrityError) as err:
+        # "A user with this email already exists. Please use a different email."
+        add_error(errors, "email", str(err))
+    # Catch all exceptions and don't report because we don't want to log password_hash that is generated
+    except Exception as e:
+        user = None
+        add_error(errors, "email", "Unknown exception")
 
-    if user_errors:
-        response["errors"] = user_errors
-
-    return response
+    return user
