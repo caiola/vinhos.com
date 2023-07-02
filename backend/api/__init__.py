@@ -1,4 +1,5 @@
 """Application entrypoint"""
+import logging
 import os
 
 from flask import Flask, app
@@ -14,6 +15,7 @@ from api.resources.categories import blueprint as categories_blueprint
 from api.resources.regions import blueprint as regions_blueprint
 from api.resources.stores import blueprint as stores_blueprint
 from api.resources.users import blueprint as users_blueprint
+from api.resources.verifications import blueprint as verifications_blueprint
 from seeds.seed import seed_tables
 
 
@@ -24,6 +26,7 @@ def create_app(test_config=None):
     app.debug = config.DEBUG
     app.config["SQLALCHEMY_DATABASE_URI"] = config.DB_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+    app.config["SQLALCHEMY_ECHO"] = True  # Enable query logging
 
     # Set your own secret key
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
@@ -39,7 +42,16 @@ def create_app(test_config=None):
     app.register_blueprint(ads_blueprint)
     app.register_blueprint(regions_blueprint)
     app.register_blueprint(categories_blueprint)
+    app.register_blueprint(verifications_blueprint)
     app.register_blueprint(auth_blueprint)
+
+    # Set the log level to DEBUG to see all log messages related to database queries.
+    app.logger.setLevel(logging.DEBUG)
+
+    # Optionally, you can add a StreamHandler to print log messages to the console.
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    app.logger.addHandler(stream_handler)
 
     return app
 

@@ -94,7 +94,7 @@ def registration(data: dict):
     # Create a new verification
     payload = {
         "user_id": user_id,
-        "action": "user",
+        "type": "user",
     }
 
     verification_result = verifications.create(payload, errors)
