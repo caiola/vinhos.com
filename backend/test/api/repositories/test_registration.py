@@ -80,38 +80,40 @@ def test_create_new_account_with_empty_data(app):
     assert len(errors) == 1
 
 
-# def test_create_new_account_with_empty_fields(app):
-#     data = {
-#         "country": "",
-#         "account_name": "",
-#         "email": "",
-#     }
-#     errors = []
-#     # Mock the accounts.get_by method to simulate no existing account
-#     with app.app_context():
-#         with patch("api.repositories.accounts.get_by") as mock_get_by:
-#             mock_get_by.side_effect = NoResultFound()
-#
-#             # Mock the Account save method to return a dummy account
-#             with patch.object(Account, "save") as mock_save:
-#                 mock_save.return_value = None
-#
-#                 result = create(data, errors)
-#
-#     # Verify that the function created a new account
-#     assert not isinstance(result, Account)
-#     expected = [
-#         {"ref": "account_name", "message": "Shorter than minimum length 3."},
-#         {"ref": "country", "message": "Length must be between 2 and 2."},
-#         {"ref": "email", "message": "email-invalid"},
-#     ]
-#
-#     errors = sorted(data, key=lambda x: x["ref"])
-#
-#     # Check if it is a subset
-#     assert expected == errors
-#
-#     assert len(errors) == 3
+def test_create_new_account_with_empty_fields(app):
+    data = {
+        "country": "",
+        "account_name": "",
+        "email": "",
+    }
+    errors = []
+    # Mock the accounts.get_by method to simulate no existing account
+    with app.app_context():
+        with patch("api.repositories.accounts.get_by") as mock_get_by:
+            mock_get_by.side_effect = NoResultFound()
+
+            # Mock the Account save method to return a dummy account
+            with patch.object(Account, "save") as mock_save:
+                mock_save.return_value = None
+
+                result = create(data, errors)
+
+    # Verify that the function created a new account
+    assert not isinstance(result, Account)
+    expected = [
+        {"ref": "account_name", "message": "Shorter than minimum length 3."},
+        {"ref": "country", "message": "Length must be between 2 and 2."},
+        {"ref": "email", "message": "email-invalid"},
+    ]
+
+    sorted_expected = sorted(expected, key=lambda x: x["ref"])
+
+    sorted_errors = sorted(errors, key=lambda x: x["ref"])
+
+    # Check if it is a subset
+    assert sorted_expected == sorted_errors
+
+    assert len(errors) == 3
 
 
 def test_create_new_account_with_unknown_field(app):
