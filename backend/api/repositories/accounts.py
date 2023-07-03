@@ -42,17 +42,17 @@ class AccountCreateSchema(Schema):
     # )
 
 
-def get_by(pk: int = None, name: str = None) -> Account:
-    """Query a account by uuid or id"""
+def get_by(id: int = None, name: str = None) -> Account:
+    """Query account by uuid or id"""
     params = {}
-    if (not pk and not name) or (pk and name):
-        raise ValueError("Provide pk or name")
+    if (not id and not name) or (id and name):
+        raise ValueError("Provide id or name")
 
     if name:
         params["account_name"] = name
 
-    if pk:
-        params["pk"] = pk
+    if id:
+        params["id"] = id
 
     return Account.query.filter_by(**params).one()
 
