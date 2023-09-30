@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row align="center" justify="center">
+    <v-row align="center" justify="center" style="margin-top: 55px;">
       <TopMenu />
     </v-row>
     <v-row >
