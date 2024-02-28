@@ -34,7 +34,7 @@ services:
       context: backend
       args:
         - PYTHON_VERSION=${PYTHON_VERSION}
-      dockerfile: dockerfile-apiserver
+      dockerfile: Dockerfile
     # working_dir: /mnt
     working_dir: /app
     volumes:
