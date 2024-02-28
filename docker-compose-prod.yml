@@ -29,20 +29,22 @@ services:
       - --providers.docker.exposedByDefault=false
       - --api
       - --certificatesresolvers.le.acme.email=${TRAEFIK_SSLEMAIL?Variable not set}
-      - --certificatesresolvers.le.acme.storage=./acme.json
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.tlschallenge=true
       # - "--certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.le.org/directory"
       - "--certificatesResolvers.le.acme.tlschallenge=true"
       - "--accesslog=true"
       - "--log.level=DEBUG"
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./acme.json:/acme.json"
+      - letsencrypt:/letsencrypt
     labels:
       - "traefik.enable=true"
+      - --log.level=DEBUG
+      #- --log.filepath=/var/log/traefik.log
+      - --accesslog=true
+      #- --accesslog.filepath=/var/log/traefik-access.log
+      - --providers.docker.network=netpublic
       # Dashboard
       - "traefik.http.routers.traefik.rule=Host(`${DOMAIN_VHOST_BOARD}`)"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -79,7 +81,10 @@ services:
     environment:
       - FLASK_APP=${FLASK_APP}
       - FLASK_DEBUG=${FLASK_DEBUG}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SERVICE_LOG=${SERVICE_LOG}
+      - APPLICATION_HOST=${APPLICATION_HOST}
+      - APPLICATION_PORT=${APPLICATION_PORT}
       - DOMAIN_VHOST_ROOT=${DOMAIN_VHOST_ROOT}
       - DOMAIN_VHOST_BOARD=${DOMAIN_VHOST_BOARD}
       - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
@@ -105,8 +110,8 @@ services:
         - NODE_VERSION=${NODE_VERSION}
       dockerfile: dockerfile-vhostwww-dev
     env_file: .env
-      #environment:
-      #- NODE_ENV="development"
+    #environment:
+    #- NODE_ENV="development"
     # The base node image sets a very verbose log level. => ENV NPM_CONFIG_LOGLEVEL warn
     #- NPM_CONFIG_LOGLEVEL warn
     ports:
@@ -115,13 +120,28 @@ services:
     volumes:
       - "./frontend/www:/app"
     labels:
+      #- "traefik.enable=true"
+      #- "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_WEB}`)"
+      #- "traefik.http.routers.vhostwww.entrypoints=websecure"
+      #- "traefik.http.routers.vhostwww.tls=true"
+      #- "traefik.http.routers.vhostwww.tls.certresolver=le"
+      #- "traefik.http.routers.vhostwww.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
+      #- "traefik.http.services.vhostwww.loadbalancer.server.port=${WEB_SERVER_PORT_INTERNAL}"
+      # global redirect to https
+      #- "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      #- "traefik.http.routers.http-catchall.entrypoints=web"
+      #- "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      # middleware redirect
+      #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
       - "traefik.enable=true"
-      - "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_WEB}`)"
-      - "traefik.http.routers.vhostwww.entrypoints=websecure"
-      - "traefik.http.routers.vhostwww.tls=true"
-      - "traefik.http.routers.vhostwww.tls.certresolver=le"
-      - "traefik.http.routers.vhostwww.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
-      - "traefik.http.services.vhostwww.loadbalancer.server.port=${WEB_SERVER_PORT_INTERNAL}"
+      - "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_ROOT}`) || Host(`${DOMAIN_VHOST_WEB}`)"
+      - "traefik.http.routers.vhostwww.entrypoints=web"
+      - "traefik.http.routers.vhostwww.middlewares=redirect-to-https@docker"
+      - "traefik.http.routers.vhostwww-secure.rule=Host(`${DOMAIN_VHOST_ROOT}`) || Host(`${DOMAIN_VHOST_WEB}`)"
+      - "traefik.http.routers.vhostwww-secure.entrypoints=websecure"
+      - "traefik.http.routers.vhostwww-secure.tls.certresolver=le"
+      - "traefik.http.middlewares.redirect-to-https.redirectScheme.scheme=https"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
     # depends_on:
     #  - apiserver
@@ -131,3 +151,9 @@ services:
 networks:
   netpublic:
     external: true
+  netprivate:
+    external: false
+
+volumes:
+  letsencrypt:
+    name: letsencrypt

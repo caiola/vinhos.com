@@ -7,6 +7,9 @@ services:
   traefik:
     image: traefik:${TRAEFIK_VERSION}
     env_file: .env
+    ports:
+      - 80:80
+      - 443:443
     hostname: traefik
     container_name: traefik
     environment:
@@ -26,20 +29,22 @@ services:
       - --providers.docker.exposedByDefault=false
       - --api
       - --certificatesresolvers.le.acme.email=${TRAEFIK_SSLEMAIL?Variable not set}
-      - --certificatesresolvers.le.acme.storage=./acme.json
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.tlschallenge=true
       - "--certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.le.org/directory"
       - "--certificatesResolvers.le.acme.tlschallenge=true"
       - "--accesslog=true"
       - "--log.level=DEBUG"
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./acme.json:/acme.json"
+      - letsencrypt:/letsencrypt
     labels:
       - "traefik.enable=true"
+      - --log.level=DEBUG
+      #- --log.filepath=/var/log/traefik.log
+      - --accesslog=true
+      #- --accesslog.filepath=/var/log/traefik-access.log
+      - --providers.docker.network=netpublic
       # Dashboard
       - "traefik.http.routers.traefik.rule=Host(`${DOMAIN_VHOST_BOARD}`)"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -57,12 +62,12 @@ services:
     restart: unless-stopped
     networks:
       - netpublic
-
-  db:
-    image: mariadb:10.6.11
-    volumes:
-      - ./data/mariadb:/var/lib/mysql
-    env_file: .env
+  
+  #  db:
+  #    image: mariadb:10.6.11
+  #    volumes:
+  #      - ./data/mariadb:/var/lib/mysql
+  #    env_file: .env
 
   apiserver:
     hostname: apiserver
@@ -100,8 +105,8 @@ services:
       - "traefik.http.routers.apiserver.tls.domains[0].main=${DOMAIN_VHOST_API}"
       - "traefik.http.services.apiserver.loadbalancer.server.port=${API_SERVER_PORT_INTERNAL}"
     command: flask run --host ${APPLICATION_HOST} --port ${API_SERVER_PORT_INTERNAL} --debugger --with-threads
-    depends_on:
-      - db
+    #    depends_on:
+    #      - db
     networks:
       - netpublic
 
@@ -113,22 +118,39 @@ services:
       dockerfile: dockerfile-vhostwww-local
     env_file: .env
     #environment:
-      #- NODE_ENV="development"
-      # The base node image sets a very verbose log level. => ENV NPM_CONFIG_LOGLEVEL warn
-      #- NPM_CONFIG_LOGLEVEL warn
+    #- NODE_ENV="development"
+    # The base node image sets a very verbose log level. => ENV NPM_CONFIG_LOGLEVEL warn
+    #- NPM_CONFIG_LOGLEVEL warn
     ports:
       - "${WEB_SERVER_PORT_EXTERNAL}:${WEB_SERVER_PORT_INTERNAL}"
       - "${WEB_HMR_SERVER_PORT_EXTERNAL}:${WEB_HMR_SERVER_PORT_INTERNAL}"
     volumes:
       - "./frontend/www:/app"
     labels:
+      #      - "traefik.enable=true"
+      #      - "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_ROOT}`) || Host(`${DOMAIN_VHOST_WEB}`)"
+      #      - "traefik.http.routers.vhostwww.entrypoints=web"
+      #      - "traefik.http.routers.vhostwww.middlewares=redirect-to-https@docker"
+      #
+      #      - "traefik.http.routers.vhostwww-secure.rule=Host(`${DOMAIN_VHOST_ROOT}`) || Host(`${DOMAIN_VHOST_WEB}`)"
+      #      - "traefik.http.routers.vhostwww-secure.entrypoints=websecure"
+      #
+      #      #- "traefik.http.routers.vhostwww-secure.tls=true"
+      #      #- "traefik.http.routers.vhostwww-secure.tls.certresolver=le"
+      #      #- "traefik.http.routers.vhostwww-secure.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
+      #      #- "traefik.http.services.vhostwww.loadbalancer.server.port=${WEB_SERVER_PORT_INTERNAL}"
+      #
+      #      - "traefik.http.middlewares.redirect-to-https.redirectScheme.scheme=https"
+      #      - "traefik.http.middlewares.redirect-to-https.redirectScheme.permanent=true"
+
       - "traefik.enable=true"
-      - "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_WEB}`)"
-      - "traefik.http.routers.vhostwww.entrypoints=websecure"
-      - "traefik.http.routers.vhostwww.tls=true"
-      - "traefik.http.routers.vhostwww.tls.certresolver=le"
-      - "traefik.http.routers.vhostwww.tls.domains[0].main=${DOMAIN_VHOST_WEB}"
-      - "traefik.http.services.vhostwww.loadbalancer.server.port=${WEB_SERVER_PORT_INTERNAL}"
+      - "traefik.http.routers.vhostwww.rule=Host(`${DOMAIN_VHOST_ROOT}`) || Host(`${DOMAIN_VHOST_WEB}`)"
+      - "traefik.http.routers.vhostwww.entrypoints=web"
+      - "traefik.http.routers.vhostwww.middlewares=redirect-to-https@docker"
+      - "traefik.http.routers.vhostwww-secure.rule=Host(`${DOMAIN_VHOST_ROOT}`) || Host(`${DOMAIN_VHOST_WEB}`)"
+      - "traefik.http.routers.vhostwww-secure.entrypoints=websecure"
+      - "traefik.http.routers.vhostwww-secure.tls.certresolver=le"
+      - "traefik.http.middlewares.redirect-to-https.redirectScheme.scheme=https"
     command: sh -c "cd /app && npm install -g pnpm && pnpm install && pnpm dev"
     # depends_on:
     #  - apiserver
@@ -186,51 +208,51 @@ services:
     networks:
       - netpublic
 
-#  appserver:
-#    image: containous/whoami:v1.5.0
-#    hostname: appserver
-#    container_name: appserver
-#    env_file: .env
-#    restart: unless-stopped
-#    environment:
-#      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
-#      - TZ=${TIMEZONE}
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
-#      - "traefik.http.routers.appserver.entrypoints=websecure"
-#      - "traefik.http.routers.appserver.tls=true"
-#      - "traefik.http.routers.appserver.tls.certresolver=le"
-#      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
-#    networks:
-#      - netpublic
+  #  appserver:
+  #    image: containous/whoami:v1.5.0
+  #    hostname: appserver
+  #    container_name: appserver
+  #    env_file: .env
+  #    restart: unless-stopped
+  #    environment:
+  #      - DOMAIN_VHOST_APP=${DOMAIN_VHOST_APP}
+  #      - TZ=${TIMEZONE}
+  #    labels:
+  #      - "traefik.enable=true"
+  #      - "traefik.http.routers.appserver.rule=Host(`${DOMAIN_VHOST_APP}`)"
+  #      - "traefik.http.routers.appserver.entrypoints=websecure"
+  #      - "traefik.http.routers.appserver.tls=true"
+  #      - "traefik.http.routers.appserver.tls.certresolver=le"
+  #      - "traefik.http.routers.appserver.tls.domains[0].main=${DOMAIN_VHOST_APP}"
+  #    networks:
+  #      - netpublic
 
-#  webserver:
-#    image: nginx/1.23.3
-#    hostname: webserver
-#    container_name: webserver
-#    env_file: .env
-#    build:
-#      context: ./frontend
-#      args:
-#        - NGINX_VERSION=${NGINX_VERSION}
-#      dockerfile: dockerfile-webserver-dev
-##    working_dir: /www
-##    #volumes:
-##    #  - ./frontend:/www
-##    restart: unless-stopped
-##    environment:
-##      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
-##      - TZ=${TIMEZONE}
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.webserver.rule=Host(`${DOMAIN_VHOST_WEB}1`)"
-#      - "traefik.http.routers.webserver.entrypoints=websecure"
-#      - "traefik.http.routers.webserver.tls=true"
-#      - "traefik.http.routers.webserver.tls.certresolver=le"
-#      - "traefik.http.routers.webserver.tls.domains[0].main=${DOMAIN_VHOST_WEB}1"
-#    networks:
-#      - netpublic
+  #  webserver:
+  #    image: nginx/1.23.3
+  #    hostname: webserver
+  #    container_name: webserver
+  #    env_file: .env
+  #    build:
+  #      context: ./frontend
+  #      args:
+  #        - NGINX_VERSION=${NGINX_VERSION}
+  #      dockerfile: dockerfile-webserver-dev
+  ##    working_dir: /www
+  ##    #volumes:
+  ##    #  - ./frontend:/www
+  ##    restart: unless-stopped
+  ##    environment:
+  ##      - DOMAIN_VHOST_WEB=${DOMAIN_VHOST_WEB}
+  ##      - TZ=${TIMEZONE}
+  #    labels:
+  #      - "traefik.enable=true"
+  #      - "traefik.http.routers.webserver.rule=Host(`${DOMAIN_VHOST_WEB}1`)"
+  #      - "traefik.http.routers.webserver.entrypoints=websecure"
+  #      - "traefik.http.routers.webserver.tls=true"
+  #      - "traefik.http.routers.webserver.tls.certresolver=le"
+  #      - "traefik.http.routers.webserver.tls.domains[0].main=${DOMAIN_VHOST_WEB}1"
+  #    networks:
+  #      - netpublic
 
   toolsserver:
     image: busybox
@@ -260,5 +282,9 @@ services:
 networks:
   netpublic:
     external: true
-  netprivate:
-    external: false
+#  netprivate:
+#    external: false
+
+volumes:
+  letsencrypt:
+    name: letsencrypt
