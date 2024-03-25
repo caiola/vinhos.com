@@ -15,7 +15,9 @@ class TestWineCategories(unittest.TestCase):
         wine_categories_generator = WineCategories.all()
 
         # Assert
-        for expected_category, actual_category in zip(expected_categories, wine_categories_generator):
+        for expected_category, actual_category in zip(
+            expected_categories, wine_categories_generator
+        ):
             self.assertDictEqual(expected_category, actual_category)
 
 

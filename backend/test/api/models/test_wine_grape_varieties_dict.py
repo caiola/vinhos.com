@@ -16,7 +16,9 @@ class TestWineGrapeVarieties(unittest.TestCase):
         wine_varieties_generator = WineGrapeVarieties.all()
 
         # Assert
-        for expected_variety, actual_variety in zip(expected_varieties, wine_varieties_generator):
+        for expected_variety, actual_variety in zip(
+            expected_varieties, wine_varieties_generator
+        ):
             self.assertDictEqual(expected_variety, actual_variety)
 
 

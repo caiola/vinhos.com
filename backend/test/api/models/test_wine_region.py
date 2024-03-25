@@ -27,7 +27,9 @@ class TestWineRegions(unittest.TestCase):
         wine_regions_generator = WineRegions.all()
 
         # Assert
-        for expected_region, actual_region in zip(expected_regions, wine_regions_generator):
+        for expected_region, actual_region in zip(
+            expected_regions, wine_regions_generator
+        ):
             self.assertDictEqual(expected_region, actual_region)
 
 
