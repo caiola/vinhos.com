@@ -17,7 +17,7 @@ from api.repositories import users
 
 
 class UserCreateSchema(Schema):
-    account_id = fields.Int(required=True, error="Invalid account id")
+    account_id = fields.Int(required=True, metadata={"error": "Invalid account id"})
     email = fields.Str(
         required=True,
         validate=validate.Email(error="email-invalid"),

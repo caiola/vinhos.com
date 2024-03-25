@@ -41,24 +41,19 @@ class UsersResource(BaseResource):
             location="json",
         )
 
-        # errors = self.execute_parse_args(resource_parser)
-        #
-        # if errors:
-        #     return self.validate_payload(errors), 400
-
         errors = []
         data = request.get_json()
 
         user_result = users.create(data, errors)
 
-        return errors, 201
-
         # Do not send password_hash
         if user_result:
             user_result.pop("password_hash", None)
 
-        custom_response = user_result
-        return custom_response, 201
+        if errors:
+            user_result["errors"] = errors
+
+        return user_result, 201
 
 
 def validate_payload(self, data):

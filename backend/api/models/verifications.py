@@ -38,7 +38,9 @@ class Verification(db.Model, BaseModel, metaclass=MetaBaseModel):
         db.String(64), nullable=False, unique=True, comment="Unique token"
     )
     date_created = db.Column(
-        db.DateTime(timezone=True),
-        default=func.utcnow(),
-        comment="Date when token was created",
+        db.TIMESTAMP,
+        nullable=False,
+        index=True,
+        default=db.func.current_timestamp(),
+        comment="Timestamp with token date creation",
     )
