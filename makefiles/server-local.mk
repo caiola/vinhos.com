@@ -1,11 +1,26 @@
 ### SERVER
 # ¯¯¯¯¯¯¯¯¯¯¯
 
+tests: ## Run tests
+	docker-compose -f docker-compose-local.yml run apiserver bash -c "poetry run pytest --cov-report term --cov-report html:coverage --cov-config setup.cfg --cov=api/ test/"
+
+test.accounts: ## Run tests
+	docker-compose -f docker-compose-local.yml run apiserver bash -c "poetry run pytest test/api/repositories/test_accounts.py"
+
+showroot: ## Show root files
+	docker-compose -f docker-compose-local.yml run apiserver bash -c "ls -la"
+
+seed: ## Seed DB
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml run apiserver bash -c "poetry run flask seed_db"
+
+update.pycountry: ## update
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml run apiserver bash -c "poetry add pycountry@latest"
+
 local: ## Install server with its dependencies
 	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build && docker-compose -f docker-compose-local.yml up --build apiserver vhostwww vhostapp traefik
 
 local.force: ## Install server with its dependencies
-	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate apiserver vhostwww vhostapp traefik db
+	docker-compose -f docker-compose-local.yml down && docker-compose -f docker-compose-local.yml build --no-cache --pull && docker-compose -f docker-compose-local.yml up --build --force-recreate apiserver vhostwww vhostapp traefik
 
 local.traefik.go: ## Open service traefik with shell sh
 	docker-compose -f docker-compose-local.yml exec traefik sh

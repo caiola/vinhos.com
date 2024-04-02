@@ -19,7 +19,7 @@ def test_create_existing_account(app):
         with patch.object(accounts, "get_by") as mock_get_by:
             mock_get_by.return_value = Account(account_name="example_account")
 
-            result = create(data, errors)
+            result = create(data=data, errors=errors)
 
     # Verify that the function returned the existing account
     assert isinstance(result, Account)
@@ -50,7 +50,7 @@ def test_create_new_account(app):
                         id=123, account_name="example_account"
                     )
 
-                    result = create(data, errors)
+                    result = create(data=data, errors=errors)
 
     # Verify that the function created a new account
     assert isinstance(result, Account)
@@ -70,7 +70,7 @@ def test_create_new_account_with_empty_data(app):
             with patch.object(Account, "save") as mock_save:
                 mock_save.return_value = None
 
-                result = create(data, errors)
+                result = create(data=data, errors=errors)
 
     # Verify that the function created a new account
     assert not isinstance(result, Account)
@@ -96,7 +96,7 @@ def test_create_new_account_with_empty_fields(app):
             with patch.object(Account, "save") as mock_save:
                 mock_save.return_value = None
 
-                result = create(data, errors)
+                result = create(data=data, errors=errors)
 
     # Verify that the function created a new account
     assert not isinstance(result, Account)
@@ -128,7 +128,7 @@ def test_create_new_account_with_unknown_field(app):
             with patch.object(Account, "save") as mock_save:
                 mock_save.return_value = None
 
-                result = create(data, errors)
+                result = create(data=data, errors=errors)
 
     # Verify that the function created a new account
     assert not isinstance(result, Account)
@@ -148,7 +148,7 @@ def test_create_new_account_with_missing_fields(app):
             with patch.object(Account, "save") as mock_save:
                 mock_save.return_value = None
 
-                result = create(data, errors)
+                result = create(data=data, errors=errors)
 
     # Verify that the function created a new account
     assert not isinstance(result, Account)

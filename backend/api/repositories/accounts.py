@@ -4,7 +4,7 @@ import pycountry
 from flask import current_app
 from marshmallow import RAISE, Schema, ValidationError, fields, validate
 from sqlalchemy.exc import NoResultFound
-from typing import Any, Union
+from typing import Union
 
 from api.models import Account
 from api.models.status_type import StatusType
@@ -57,7 +57,7 @@ def get_by(id: int = None, name: str = None) -> Account:
     return Account.query.filter_by(**params).one()
 
 
-def exists(data, errors) -> Any:
+def exists(data: dict, errors: list) -> bool:
     account_name = get_value(data, "account_name", "").lower()
 
     found = False
