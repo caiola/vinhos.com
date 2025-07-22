@@ -1,3 +1,8 @@
+# DEVELOPMENT is STOPPED on this project
+
+Development is progressing in another repository. For the moment, this repo will not receive updates.
+
+
 # Vinhos.com [![codecov](https://codecov.io/gh/caiola/vinhos.com/branch/develop/graph/badge.svg?token=1JNNGN2VYK)](https://codecov.io/gh/caiola/vinhos.com)
 
 Welcome to Vinhos.com, the revolutionary open source platform for all things and wines!
